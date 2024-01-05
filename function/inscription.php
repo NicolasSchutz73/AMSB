@@ -12,7 +12,7 @@ if (isset($_POST['submit'])){
     if (empty($lastname) || empty($firstname) || empty($email) || empty($password)) {
         echo "Veuillez remplir tous les champs.\n";
     } else {
-        // verif compte existe pas 
+        // verif compte existe pas
         $checkEmailQuery = "SELECT id FROM user WHERE email = '$email'";
         $checkEmailResult = $conn->query($checkEmailQuery);
 

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Group;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -47,5 +48,10 @@ class User extends Authenticatable
     public function courses(): BelongsToMany
     {
         return $this->belongsToMany((Course::class));
+    }
+
+    public function groups(): BelongsToMany
+    {
+        return $this->belongsToMany(Group::class)->withTimestamps();
     }
 }

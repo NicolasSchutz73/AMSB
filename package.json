@@ -7,6 +7,7 @@
     },
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.2",
+        "@vitejs/plugin-vue": "^5.0.2",
         "alpinejs": "^3.4.2",
         "autoprefixer": "^10.4.2",
         "axios": "^1.6.1",
@@ -17,6 +18,9 @@
     },
     "dependencies": {
         "@fullcalendar/core": "^6.1.10",
-        "@fullcalendar/timegrid": "^6.1.10"
+        "@fullcalendar/timegrid": "^6.1.10",
+        "laravel-echo": "^1.15.3",
+        "pusher-js": "^8.4.0-rc2",
+        "vue": "^3.4.5"
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Conversation;
+use App\Models\Conversation;
 use App\Events\NewMessage;
 use Illuminate\Http\Request;
 

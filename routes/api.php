@@ -18,3 +18,7 @@ Route::middleware('auth:sanctum')->group(static function () : void {
     Route::get('events', \App\Http\Controllers\Api\Events\IndexController::class)->name('events');
     Route::put('subscribe', \App\Http\Controllers\Api\Courses\SubscribeController::class)->name('subscribe');
 });
+
+Route::middleware('auth:api')->get('/user', function (Request $request) {
+    return $request->user();
+});

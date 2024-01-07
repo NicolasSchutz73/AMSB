@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Group;
+use App\Models\Group;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -15,7 +15,7 @@ class GroupCreated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $group;
+    public Group $group;
 
     /**
      * Create a new event instance.
@@ -32,12 +32,12 @@ class GroupCreated implements ShouldBroadcast
      *
      * @return Channel|array
      */
-    public function broadcastOn()
+    public function broadcastOn(): Channel|array
     {
         $channels = [];
 
         foreach ($this->group->users as $user) {
-            array_push($channels, new PrivateChannel('users.' . $user->id));
+            $channels[] = new PrivateChannel('users.' . $user->id);
         }
 
         return $channels;

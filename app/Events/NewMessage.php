@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Conversation;
+use App\Models\Conversation;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -10,12 +10,13 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use JetBrains\PhpStorm\ArrayShape;
 
 class NewMessage implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $conversation;
+    public Conversation $conversation;
 
     /**
      * Create a new event instance.
@@ -32,12 +33,12 @@ class NewMessage implements ShouldBroadcast
      *
      * @return Channel|array
      */
-    public function broadcastOn()
+    public function broadcastOn(): Channel|PrivateChannel|array
     {
         return new PrivateChannel('groups.' . $this->conversation->group->id);
     }
 
-    public function broadcastWith()
+    #[ArrayShape(['message' => "mixed", 'user' => "array"])] public function broadcastWith(): array
     {
         return [
             'message' => $this->conversation->message,

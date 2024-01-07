@@ -2,8 +2,14 @@ import './bootstrap';
 import Alpine from 'alpinejs';
 import { Calendar } from '@fullcalendar/core';
 import timeGridPlugin from '@fullcalendar/timegrid';
-import { createApp } from 'vue'; // Importer createApp de Vue 3
-import Groups from './components/Groups.vue'; // Assurez-vous que ce chemin est correct
+import { createApp } from 'vue';
+
+import store from './store';
+import GroupChat from './components/GroupChat.vue';
+import CreateGroup from './components/CreateGroup.vue';
+import Groups from './components/Groups.vue';
+
+
 
 // Démarrer Alpine.js
 window.Alpine = Alpine;
@@ -37,12 +43,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     calendar.render();
 });
 
-// Vérifier si l'élément #app existe avant d'essayer de monter l'application Vue
-if (document.querySelector('#app')) {
-    // Créer une nouvelle instance de l'application Vue
-    createApp({
-        components: {
-            'groups': Groups
-        }
-    }).mount('#app');
-}
+const app = createApp({
+    components: {
+        'groups': Groups,
+        'group-chat': GroupChat,
+        'create-group': CreateGroup
+    }
+});
+
+app.use(store);
+app.mount('#app');

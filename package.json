@@ -21,6 +21,7 @@
         "@fullcalendar/timegrid": "^6.1.10",
         "laravel-echo": "^1.15.3",
         "pusher-js": "^8.4.0-rc2",
-        "vue": "^3.4.5"
+        "vue": "^3.4.5",
+        "vuex": "^4.0.2"
     }
 }

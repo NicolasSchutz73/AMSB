@@ -1,0 +1,270 @@
+body {
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(180deg, rgba(194, 0, 0, 1) 0%, rgba(33, 162, 38, 0.1) 100%, rgba(44, 3, 3, 0.05) 100%);
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* partie navbar */
+.navbar {
+    background-color: #000;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 35px;
+    width: calc(100% - 20px);
+}
+
+.container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand {
+    color: #C20000;
+    text-decoration: none;
+    font-size: large;
+}
+
+.menu-toggle {
+    background-color: #C20000;
+    height: 30px;
+    aspect-ratio: 1/1;
+    cursor: pointer;
+    display: flex;
+    border-radius: 5px;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.menu-toggle > div {
+    background-color: #000;
+    height: 5%;
+    width: 75%;
+    border-radius: 5px;
+    transform-origin: 20.5% 3.5px;
+}
+
+.menu-toggle > div:nth-child(1).active {
+    transform: rotate(30deg);
+}
+
+.menu-toggle > div:nth-child(2).active {
+    display: none;
+}
+
+.menu-toggle > div:nth-child(3).active {
+    transform: rotate(-30deg);
+}
+
+.navbar-links {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    position: absolute;
+    top: 50px;
+    left: 0;
+    background-color: #000;
+    z-index: 1;
+    border-radius: 0 0 15px 15px;
+}
+
+.navbar-links.show {
+    display: flex;
+}
+
+.navbar-links a {
+    text-decoration: none;
+    padding: 10px;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+    color: #C20000;
+}
+
+
+/* partie connexion */
+.login {
+    width: 100%;
+    height: 100%;
+}
+
+.oval:nth-child(1) {
+    width: 80%;
+    height: 20%;
+    background: #BBC5AA;
+    border-radius: 50%;
+    rotate: 65deg;
+    position: absolute;
+    top: 0%;
+    left: -40%;
+    z-index: -1;
+    box-shadow: 3px 3px 20px rgba(0, 0, 0, 0.5);
+}
+
+.oval:nth-child(3) {
+    width: 80%;
+    height: 20%;
+    background: #BBC5AA;
+    border-radius: 50%;
+    rotate: -65deg;
+    position: absolute;
+    top: 0%;
+    right: -40%;
+    z-index: -1;
+    box-shadow: -3px -3px 20px rgba(0, 0, 0, 0.5);
+}
+
+.imgBall {
+    width: 50%;
+    background: #000;
+    border-radius: 50%;
+    rotate: -65deg;
+    position: absolute;
+    top: -5%;
+    left: 25%;
+    z-index: -1;
+    aspect-ratio: 1/1;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+}
+
+
+.content {
+    position: absolute;
+    top: 30%;
+    left: 5%;
+    width: calc(90% - 20px);
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.75);
+    padding: 10px;
+}
+
+.content > h2 {
+    font-size: large;
+    color: white;
+    margin: 0;
+    margin-bottom: 10px;
+}
+
+label {
+    font-size: small;
+    color: white;
+}
+
+input:nth-child(1),
+input:nth-child(2) {
+    width: 100%;
+    padding: 5px 10px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+input[type=submit] {
+    width: 100%;
+    background-color: #E6EED6;
+    color: rgba(0, 0, 0, 0.75);
+    font-weight: 700;
+    padding: 5px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+input[type=submit]:hover {
+    background-color: #BBC5AA;
+}
+
+.panier {
+    position: absolute;
+    top: 65%;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+}
+
+/* partie inscription */
+
+
+.form-step {
+    display: none;
+}
+
+.form-step.active {
+    display: block;
+}
+
+/* Ajoutez des styles supplémentaires au besoin */
+input {
+    margin-bottom: 10px;
+}
+button {
+    width: 100%;
+    background-color: #E6EED6;
+    color: rgba(0, 0, 0, 0.75);
+    font-weight: 700;
+    padding: 5px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button {
+    background-color: #BBC5AA;
+}
+
+.personnageBloc{
+    width: 100%;
+}
+
+.personnageBloc > img{
+    display: none;
+    position: absolute;
+    height: 10%;
+    bottom: 10px;
+    left: 50%;
+    transform: translate(-50%, 0);
+}
+
+.personnageBloc > img.active{
+    display: block;
+}
+
+.ovalBas{
+    width: 100%;
+    height: 30%;
+    background: #BBC5AA;
+    border-radius: 50%;
+    rotate: 0deg;
+    position: absolute;
+    bottom: -15%;
+    left: 0%;
+    z-index: -1;
+    box-shadow: 0px 3px 20px rgba(0, 0, 0, 0.5);
+}
+
+.alert{
+    background-color: #C20000;
+    margin: 15px;
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 3px 3px 20px rgba(0, 0, 0, 0.5);
+    color: white;
+    font-size: small;
+}

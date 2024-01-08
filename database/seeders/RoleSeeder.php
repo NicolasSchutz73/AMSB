@@ -17,7 +17,7 @@ class RoleSeeder extends Seeder
         Role::create(['name' => 'Super Admin']); // Pratiques courante d'avoir un Super Admin, possède tout les droits du site
         $admin = Role::create(['name' => 'Admin']);
 
-        // Attribution des rôles
+        // Attribution des permissions
         $admin->givePermissionTo([
             'create-user',
             'edit-user',

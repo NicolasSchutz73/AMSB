@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-// use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -21,6 +21,11 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Utilisation de la façade Gate pour définir des permissions globales
+        Gate::before(function ($user, $ability) {
+            // Si l'utilisateur a le rôle 'Super Admin',
+            // Toutes les vérifications d'autorisations sont automatiquement passées pour cet utilisateur
+            return $user->hasRole('Super Admin') ? true : null;
+        });
     }
 }

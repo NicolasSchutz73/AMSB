@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\ConversationController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,7 +32,11 @@ Route::get('/calendar', function () {
     return view('calendar');
 })->middleware(['auth', 'verified'])->name('calendar');
 
-
+// Routes des ressources pour les rôles et utilisateurs
+Route::resources([
+    'roles' => RoleController::class, // Ressources pour la gestion des rôles
+    'users' => UserController::class, // Ressources pour la gestion des utilisateurs
+]);
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -40,10 +46,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::resource('groups', GroupController::class);
     Route::resource('conversations', ConversationController::class);
-
-
 });
-
-
 
 require __DIR__.'/auth.php';

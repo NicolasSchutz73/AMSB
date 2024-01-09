@@ -33,6 +33,14 @@ Route::get('/calendar', function () {
     return view('calendar');
 })->middleware(['auth', 'verified'])->name('calendar');
 
+Route::get('/chat-room', function () {
+    return view('chatRoom');
+})->middleware(['auth', 'verified'])->name('chat-room');
+
+
+
+
+
 // Routes des ressources pour les rôles et utilisateurs et chat
 Route::resources([
     'roles' => RoleController::class, // Ressources pour la gestion des rôles
@@ -49,6 +57,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::resource('groups', GroupController::class);
     Route::resource('conversations', ConversationController::class);
+
+
 });
+
+Route::get('/chat-room-users', [UserController::class, 'chatRoomUsers'])
+    ->middleware(['auth', 'verified'])
+    ->name('chat-room-users');
+// Utilise ce code dans routes/api.php pour une réponse JSON
+Route::get('/users', [UserController::class, 'apiIndex']);
+
 
 require __DIR__.'/auth.php';

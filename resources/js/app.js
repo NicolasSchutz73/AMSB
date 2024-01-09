@@ -12,12 +12,22 @@ import Groups from './components/Groups.vue';
 import './bootstrap';
 import axios from 'axios';
 
+
 // Démarrer Alpine.js
 window.Alpine = Alpine;
 Alpine.start();
 
+
+
 // Attendre que le DOM soit chargé avant de lancer des opérations DOM
+// <<------------>> //
+
 document.addEventListener('DOMContentLoaded', async function() {
+
+    // ----------- //
+    //  Calendrier //
+    // ----------- //
+
     const calendarEl = document.querySelector('#calendar');
 
     if (calendarEl == null) return;
@@ -42,44 +52,44 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     calendar.setOption('locale', 'fr');
     calendar.render();
-});
 
+    // ----------- //
+    // ChatGlobal  //
+    // ----------- //
 
-const messageInput = document.getElementById("message");
-const chatDiv = document.getElementById('chat');
-const submitButton = document.getElementById('submitButton');
+    const messageInput = document.getElementById("message");
+    const chatDiv = document.getElementById('chat');
+    const submitButton = document.getElementById('submitButton');
 
+    submitButton.addEventListener('click', () => {
+        // Construction du nickname à partir des données de l'utilisateur
+        const nickname = window.User ? `${window.User.firstname} ${window.User.lastname}` : 'Utilisateur inconnu';
 
-
-submitButton.addEventListener('click', () => {
-    // Construction du nickname à partir des données de l'utilisateur
-    const nickname = window.User ? `${window.User.firstname} ${window.User.lastname}` : 'Utilisateur inconnu';
-
-    axios.post('/chat', {
-        nickname: nickname,
-        message: messageInput.value
-    }).then(response => {
-        console.log(response);
-        messageInput.value = '';
-    }).catch(error => {
-        console.error(error);
+        axios.post('/chat', {
+            nickname: nickname,
+            message: messageInput.value
+        }).then(response => {
+            console.log(response);
+            messageInput.value = '';
+        }).catch(error => {
+            console.error(error);
+        });
     });
+
+    window.Echo.channel('chat').listen('.chat-message', (event)=>{
+        console.log(event)
+
+        chatDiv.innerHTML += `
+
+       <div class="other break-all mt-2  ml-5 rounded-bl-none float-none bg-gray-300 mr-auto rounded-2xl p-2">
+            <p>${event.message} par  <em>${event.nickname}</em></p>
+       </div>
+
+    `
+    })
+
 });
-
-
-window.Echo.channel('chat').listen('.chat-message', (event)=>{
-    console.log(event)
-
-    chatDiv.innerHTML += `
-
-   <div class="other break-all mt-2  ml-5 rounded-bl-none float-none bg-gray-300 mr-auto rounded-2xl p-2">
-        <p>${event.message} par  <em>${event.nickname}</em></p>
-   </div>
-
-`
-})
-
-
+// <<------------>> //
 
 
 

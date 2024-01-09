@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\User;
+use App\Http\Requests\UpdateRoleRequest;
 use App\Http\Requests\StoreUserRequest;
-use App\Http\Requests\UpdateUserRequest;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 
 class RoleController extends Controller
@@ -45,8 +42,8 @@ class RoleController extends Controller
      */
     public function create(): View
     {
-        return view('users.create', [
-            'roles' => Role::pluck('name')->all()
+        return view('roles.create', [
+            'permissions' => Permission::get()
         ]);
     }
 
@@ -55,16 +52,16 @@ class RoleController extends Controller
      * @param StoreUserRequest $request
      * @return RedirectResponse
      */
-    public function store(StoreUserRequest $request): RedirectResponse
+    public function store(StoreRoleRequest $request): RedirectResponse
     {
-        $input = $request->all();
-        $input['password'] = Hash::make($request->password);
+        $role = Role::create(['name' => $request->name]);
 
-        $user = User::create($input);
-        $user->assignRole($request->roles);
+        $permissions = Permission::whereIn('id', $request->permissions)->get(['name'])->toArray();
 
-        return redirect()->route('users.index')
-            ->withSuccess('Nouvel utilisateur ajouté avec succès.');
+        $role->syncPermissions($permissions);
+
+        return redirect()->route('roles.index')
+            ->withSuccess('New role is added successfully.');
     }
 
     /**
@@ -92,7 +89,7 @@ class RoleController extends Controller
     public function edit(Role $role): View
     {
         if($role->name=='Super Admin'){
-            abort(403, 'LE ROLE SUPER ADMIN NE PEUT PAS ETRE ÉDITÉ');
+            abort(403, 'SUPER ADMIN ROLE CAN NOT BE EDITED');
         }
 
         $rolePermissions = DB::table("role_has_permissions")->where("role_id",$role->id)
@@ -123,7 +120,7 @@ class RoleController extends Controller
         $role->syncPermissions($permissions);
 
         return redirect()->back()
-            ->withSuccess('Le rôle à été modifié avec succès.');
+            ->withSuccess('Role is updated successfully.');
     }
 
     /**
@@ -134,13 +131,13 @@ class RoleController extends Controller
     public function destroy(Role $role): RedirectResponse
     {
         if($role->name=='Super Admin'){
-            abort(403, 'LE ROLE SUPER ADMIN NE PEUT PAS ETRE SUPPRIMÉ');
+            abort(403, 'SUPER ADMIN ROLE CAN NOT BE DELETED');
         }
         if(auth()->user()->hasRole($role->name)){
-            abort(403, 'IMPOSSIBLE DE SUPPRIMER LE RÔLE AUTO-ATTRIBUÉ');
+            abort(403, 'CAN NOT DELETE SELF ASSIGNED ROLE');
         }
         $role->delete();
         return redirect()->route('roles.index')
-            ->withSuccess('Le rôle à été supprimé avec succès.');
+            ->withSuccess('Role is deleted successfully.');
     }
 }

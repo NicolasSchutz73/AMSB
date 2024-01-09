@@ -11,7 +11,7 @@
 
     <title>Chat</title>
 </head>
-<body>
+<body data-username="{{ Auth::user()->name}}">
 <!-- component -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- This is an example component -->
@@ -89,10 +89,16 @@
                 </button>
             </div>
         </div>
-        <div class="ml-3 mr-2 ml-2 flex flex-row border-gray items-center border rounded-3xl h-12 px-2">
-            <input type="text" id="nickname" class="border rounded-2x1 border-transparent w-full focus: outline-none text-sm h-10 flex items-center" placeholder="votre pseudo">
-
+        <div class="ml-3 mr-2 ml-2 flex flex-row border-gray items-center border rounded-3xl h-12 px-2" style="display: none">
+            <input
+                type="text"
+                id="nickname"
+                class="border rounded-2x1 border-transparent w-full focus:outline-none text-sm h-10 flex items-center"
+                placeholder="votre pseudo"
+                value="{{ Auth::user()->name }}"
+            />
         </div>
+
         <div>
             <button
                 id="submitButton"

@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         slotMaxTime: "23:00:00",
         eventClick: async function(info) {
             let { data } = await axios.put('/api/subscribe', {
-               id: info.event.id,
+                id: info.event.id,
             });
 
             info.el.style.borderColor = data.attached === true ? 'green' : 'yellow';

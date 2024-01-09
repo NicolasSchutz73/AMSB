@@ -57,4 +57,9 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+    public function getName(Request $request)
+    {
+        return response()->json(['name' => $request->user()]);
+    }
 }

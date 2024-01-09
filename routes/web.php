@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -32,11 +33,13 @@ Route::get('/calendar', function () {
     return view('calendar');
 })->middleware(['auth', 'verified'])->name('calendar');
 
-// Routes des ressources pour les rôles et utilisateurs
+// Routes des ressources pour les rôles et utilisateurs et chat
 Route::resources([
     'roles' => RoleController::class, // Ressources pour la gestion des rôles
     'users' => UserController::class, // Ressources pour la gestion des utilisateurs
+    'chat' => ChatController::class,
 ]);
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

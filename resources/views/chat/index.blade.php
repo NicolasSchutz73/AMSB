@@ -11,7 +11,7 @@
 
     <title>Chat</title>
 </head>
-<body data-username="{{ Auth::user()->name}}">
+<body>
 <!-- component -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- This is an example component -->
@@ -123,7 +123,13 @@
     </div>
 </div>
 
+<script>
+    // Créer une variable globale JavaScript pour stocker les informations de l'utilisateur
+    window.User = @json(Auth::user());
+</script>
+
 @vite('resources/js/app.js')
+
 
 </body>
 </html>

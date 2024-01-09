@@ -32,7 +32,7 @@ class UserController extends Controller
     public function index(): View
     {
         return view('users.index', [
-            'users' => User::latest('id')/*->paginate(3)*/
+            'users' => User::latest('id')->paginate(3)
         ]);
     }
 
@@ -61,7 +61,7 @@ class UserController extends Controller
         $user->assignRole($request->roles);
 
         return redirect()->route('users.index')
-            ->withSuccess('Nouvel utilisateur ajouté avec succès.');
+            ->withSuccess('New user is added successfully.');
     }
 
     /**
@@ -86,7 +86,7 @@ class UserController extends Controller
         // Check Only Super Admin can update his own Profile
         if ($user->hasRole('Super Admin')){
             if($user->id != auth()->user()->id){
-                    abort(403, 'L\'UTILISATEUR N\'A PAS LES BONNES AUTORISATIONS');
+                abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS');
             }
         }
 
@@ -118,7 +118,7 @@ class UserController extends Controller
         $user->syncRoles($request->roles);
 
         return redirect()->back()
-            ->withSuccess('Utilisateur mis à jour avec succès.');
+            ->withSuccess('User is updated successfully.');
     }
 
     /**
@@ -131,12 +131,12 @@ class UserController extends Controller
         // About if user is Super Admin or User ID belongs to Auth User
         if ($user->hasRole('Super Admin') || $user->id == auth()->user()->id)
         {
-            abort(403, 'L\'UTILISATEUR N\'A PAS LES BONNES AUTORISATIONS');
+            abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS');
         }
 
         $user->syncRoles([]);
         $user->delete();
         return redirect()->route('users.index')
-            ->withSuccess('L\'utilisateur a été supprimé avec succès.');
+            ->withSuccess('User is deleted successfully.');
     }
 }

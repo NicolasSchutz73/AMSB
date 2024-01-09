@@ -66,6 +66,7 @@ Route::get('/chat-room-users', [UserController::class, 'chatRoomUsers'])
     ->name('chat-room-users');
 // Utilise ce code dans routes/api.php pour une réponse JSON
 Route::get('/users', [UserController::class, 'apiIndex']);
+Route::post('/create-group', [GroupController::class, 'store'])->middleware('auth');
 
 
 require __DIR__.'/auth.php';

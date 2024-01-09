@@ -2,23 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\GroupCreated;
-use App\Models\Group;
 use Illuminate\Http\Request;
+use App\Models\Group;
+use App\Models\User;
 
 class GroupController extends Controller
 {
-    public function store()
+    // ...
+
+    public function store(Request $request)
     {
-        $group = Group::create(['name' => request('name')]);
+        // Valider la requête
+        $request->validate([
+            'groupName' => 'required|string|max:255',
+            'userIds' => 'required|array',
+            'userIds.*' => 'exists:users,id' // Assure-toi que les IDs d'utilisateurs existent
+        ]);
 
-        $users = collect(request('users'));
-        $users->push(auth()->user()->id);
+        // Créer un nouveau groupe
+        $group = new Group();
+        $group->name = $request->input('groupName');
+        $group->save();
 
-        $group->users()->attach($users);
+        // Associer les utilisateurs sélectionnés au groupe
+        $group->users()->sync($request->input('userIds'));
 
-        broadcast(new GroupCreated($group))->toOthers();
-
-        return $group;
+        // Retourner une réponse, par exemple
+        return response()->json(['success' => 'Groupe créé avec succès', 'group' => $group]);
     }
 }
+

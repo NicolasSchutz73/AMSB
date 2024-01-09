@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateRoleRequest;
-use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\StoreRoleRequest;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Spatie\Permission\Models\Role;

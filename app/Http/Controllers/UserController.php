@@ -31,9 +31,12 @@ class UserController extends Controller
      */
     public function index(): View
     {
+
         return view('users.index', [
             'users' => User::latest('id')->paginate(3)
         ]);
+
+
     }
 
     /**
@@ -139,4 +142,23 @@ class UserController extends Controller
         return redirect()->route('users.index')
             ->withSuccess('User is deleted successfully.');
     }
+
+
+    public function chatRoomUsers()
+    {
+        $users = User::all(); // Récupère les données nécessaires pour la fonctionnalité de chat
+        return view('chatRoom', ['users' => $users]); // Retourne une vue différente
+    }
+
+    // Méthode pour renvoyer des données JSON
+    public function apiIndex()
+    {
+        $users = User::all(); // Ou toute autre logique pour obtenir les utilisateurs
+        return response()->json($users);
+    }
+
+
+
+
+
 }

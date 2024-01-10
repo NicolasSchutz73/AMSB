@@ -37,7 +37,9 @@
         <div id="groupChatHeader" class="text-lg font-bold text-blue-600 mb-2">
             <!-- Le nom du groupe sera affiché ici -->
         </div>
-        <div id="chat" class="chat-messages overflow-y-auto h-64 mb-4">
+        <div id="chat" class="chat-messages overflow-y-auto h-64 mb-4 space-y-2">
+            <!-- Les messages seront affichés ici -->
+        </div>
             <!-- Les messages seront affichés ici -->
         </div>
         <div class="chat-input">

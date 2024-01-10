@@ -14,14 +14,29 @@ class GroupChatMessageEvent implements ShouldBroadcast
 
     public $groupId;
     public $message;
+    public $authorName;
 
-    public function __construct($groupId, $message)
+    public function __construct($groupId, $message, $authorName)
     {
         $this->groupId = $groupId;
         $this->message = $message;
+        $this->authorName = $authorName;
     }
 
-    public function broadcastOn(): PrivateChannel
+    public function broadcastWith()
+    {
+        return [
+            'message' => [
+                'id' => $this->message->id,
+                'content' => $this->message->content,
+                // autres attributs de message si nécessaire
+            ],
+            'authorName' => $this->authorName,
+        ];
+    }
+
+
+    public function broadcastOn()
     {
         return new PrivateChannel('group.' . $this->groupId);
     }

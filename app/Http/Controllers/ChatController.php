@@ -41,7 +41,9 @@ class ChatController extends Controller
         $message->save();
 
         // Diffuse le message sur le canal du groupe
-        event(new GroupChatMessageEvent($groupId, $message));
+        $authorName = auth()->user()->firstname . ' ' . auth()->user()->lastname;
+
+        event(new GroupChatMessageEvent($groupId, $message, $authorName));
         return response()->json(['success' => 'Message envoyé']);
     }
 

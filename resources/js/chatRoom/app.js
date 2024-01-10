@@ -129,18 +129,31 @@ function subscribeToGroupChannel(groupId) {
             window.Echo.private(`group.${groupId}`)
                 .listen('GroupChatMessageEvent', (e) => {
                     console.log(`Message reçu sur le canal : group.${groupId}`);
-                    appendMessageToChat(e.message.content);
+                    appendMessageToChat(e.message.content, e.message.authorName);
                 });
     }
 }
 
 
-function appendMessageToChat(messageContent) {
+function appendMessageToChat(messageContent, authorName){
     const chatDiv = document.getElementById('chat');
     const messageElement = document.createElement('div');
-    messageElement.innerText = messageContent;
+    messageElement.classList.add('p-3', 'rounded', 'bg-blue-100', 'shadow-sm');
+
+    // Ajout du nom de l'auteur
+    const authorElement = document.createElement('div');
+    authorElement.classList.add('text-sm', 'text-gray-600');
+    authorElement.innerText = authorName;
+    messageElement.appendChild(authorElement);
+
+    // Ajout du contenu du message
+    const contentElement = document.createElement('div');
+    contentElement.innerText = messageContent;
+    messageElement.appendChild(contentElement);
+
     chatDiv.appendChild(messageElement);
 }
+
 
 function sendMessage() {
     const messageInput = document.getElementById("message");

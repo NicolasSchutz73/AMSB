@@ -32,5 +32,13 @@ class SuperAdminSeeder extends Seeder
             'password' => Hash::make('ahsan1234')
         ]);
         $admin->assignRole('Admin');
+
+        $admin = User::create([
+            'firstname' => 'Baptiste',
+            'lastname' => 'audinet',
+            'email' => 'baptiste.audinet@gmail.com',
+            'password' => Hash::make('ahsan1234')
+        ]);
+        $admin->assignRole('Admin');
     }
 }

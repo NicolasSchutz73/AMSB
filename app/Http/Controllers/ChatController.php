@@ -42,7 +42,6 @@ class ChatController extends Controller
 
         // Diffuse le message sur le canal du groupe
         event(new GroupChatMessageEvent($groupId, $message));
-
         return response()->json(['success' => 'Message envoyé']);
     }
 

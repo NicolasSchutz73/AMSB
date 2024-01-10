@@ -1,132 +1,166 @@
 import axios from 'axios';
 import Echo from 'laravel-echo';
 
-// Variables globales
 let selectedUsers = [];
-let currentGroupId = null; // ID du groupe actuellement sélectionné
-let groupChannels = {}; // Pour stocker les références aux canaux de groupe
+let currentGroupId = null;
+let groupChannels = {};
+
+
+
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialisation
     loadUsers();
     loadUserGroups();
+    initializePusherListeners();
 
-    // Écouteurs d'événements
     document.getElementById('createGroupButton').addEventListener('click', createGroup);
     document.getElementById('submitButton').addEventListener('click', sendMessage);
 });
 
+
+
+// Appeler cette fonction pour forcer la réinitialisation
+
+
+function initializePusherListeners() {
+    // Initialiser les écouteurs Pusher ici si nécessaire
+}
 
 function loadUsers() {
     axios.get('../users')
         .then(response => {
             const users = response.data.data || response.data;
             const userList = document.getElementById('userList');
-
-            if (Array.isArray(users)) {
-                users.forEach(user => {
-                    const userElement = document.createElement('div');
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.value = user.id;
-
-                    // Gestionnaire d'événements pour la case à cocher
-                    checkbox.addEventListener('change', (event) => {
-                        if (event.target.checked) {
-                            selectedUsers.push(user.id); // Ajoute l'utilisateur si coché
-                        } else {
-                            selectedUsers = selectedUsers.filter(id => id !== user.id); // Supprime l'utilisateur si décoché
-                        }
-                    });
-
-                    userElement.appendChild(checkbox);
-                    userElement.append(` ${user.firstname} ${user.lastname}`);
-                    userList.appendChild(userElement);
-                });
-            }
+            users.forEach(user => appendUserToList(user, userList));
         })
         .catch(error => console.error(error));
 }
 
-function loadUserGroups() {
-    axios.get('/api/user-groups').then(response => {
-        const groups = response.data.groups;
-        const groupList = document.getElementById('groupList');
+function appendUserToList(user, userList) {
+    const userElement = document.createElement('div');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.value = user.id;
+    checkbox.addEventListener('change', (event) => {
+        handleUserSelection(event, user.id);
+    });
 
-        groups.forEach(group => {
-            addGroupToList(group);
-        });
-    }).catch(error => console.error('Erreur lors de la récupération des groupes', error));
+    userElement.appendChild(checkbox);
+    userElement.append(` ${user.firstname} ${user.lastname}`);
+    userList.appendChild(userElement);
 }
-function addGroupToList(group) {
+
+function handleUserSelection(event, userId) {
+    if (event.target.checked) {
+        selectedUsers.push(userId);
+    } else {
+        selectedUsers = selectedUsers.filter(id => id !== userId);
+    }
+}
+
+function loadUserGroups() {
+    axios.get('/api/user-groups')
+        .then(response => {
+            const groups = response.data.groups;
+            const groupList = document.getElementById('groupList');
+            groups.forEach(group => addGroupToList(group, groupList));
+        })
+        .catch(error => console.error('Erreur lors de la récupération des groupes', error));
+}
+
+function addGroupToList(group, groupList) {
     const groupElement = document.createElement('div');
     groupElement.innerText = group.name;
     groupElement.classList.add('group-item');
     groupElement.dataset.groupId = group.id;
-    document.getElementById('groupList').appendChild(groupElement);
-
-    groupElement.addEventListener('click', function() {
-        joinGroupChat(this.dataset.groupId);
-    });
+    groupElement.addEventListener('click', () => joinGroupChat(group.id));
+    groupList.appendChild(groupElement);
 }
-function joinGroupChat(groupId) {
-    currentGroupId = groupId;
-    const chatDiv = document.getElementById('chat');
-    chatDiv.innerHTML = ''; // Effacer les messages précédents
-    console.log('Rejoindre le groupe de chat', groupId);
 
-    // Mettre à jour l'en-tête avec le nom du groupe
+
+
+function clearChat() {
+    document.getElementById('chat').innerHTML = '';
+}
+
+function updateGroupChatHeader(groupId) {
     const groupElement = document.querySelector(`.group-item[data-group-id="${groupId}"]`);
-    const groupName = groupElement ? groupElement.innerText : '';
-    document.getElementById('groupChatHeader').innerText = `Chat de groupe : ${groupName}`;
+    document.getElementById('groupChatHeader').innerText = `Chat de groupe : ${groupElement ? groupElement.innerText : ''}`;
+}
+
+function loadPreviousMessages(groupId) {
+    axios.get(`/api/groups/${groupId}/messages`)
+        .then(response => {
+            response.data.messages.forEach(message => {
+                appendMessageToChat(message.content);
+            });
+        })
+        .catch(error => console.error(error));
+}
+
+function joinGroupChat(groupId) {
+    // Désabonnement de l'ancien groupe, si nécessaire
+    if (currentGroupId && groupChannels[currentGroupId]) {
+        window.Echo.leave(`group.${currentGroupId}`);
+        delete groupChannels[currentGroupId];
+    }
+
+    // Mise à jour de l'ID du groupe actuel
+    currentGroupId = groupId;
+
+    // Effacer le chat précédent
+    clearChat();
+
+    // Mettre à jour l'en-tête du chat
+    updateGroupChatHeader(groupId);
 
     // Charger les messages précédents
-    axios.get(`/api/groups/${groupId}/messages`).then(response => {
-        const messages = response.data.messages;
-        messages.forEach(message => {
-            const messageElement = document.createElement('div');
-            messageElement.innerText = message.content;
-            chatDiv.appendChild(messageElement);
-        });
-    }).catch(error => console.error(error));
+    loadPreviousMessages(groupId);
 
-    // S'abonner au canal du groupe pour les nouveaux messages
+    // Abonner au nouveau groupe
+    subscribeToGroupChannel(groupId)
+}
+
+function subscribeToGroupChannel(groupId) {
+    console.log('1')
     if (!groupChannels[groupId]) {
-        groupChannels[groupId] = window.Echo.private(`group.${groupId}`)
-            .listen('.GroupChatMessageEvent', (e) => {
-                if (groupId === currentGroupId) {
-                    const messageElement = document.createElement('div');
-                    messageElement.innerText = e.message.content;
-                    chatDiv.appendChild(messageElement);
-                }
-            });
+        console.log(`Abonnement au canal : group.${groupId}`);
+        groupChannels[groupId] =
+            window.Echo.private(`group.${groupId}`)
+                .listen('GroupChatMessageEvent', (e) => {
+                    console.log(`Message reçu sur le canal : group.${groupId}`);
+                    appendMessageToChat(e.message.content);
+                });
     }
+}
+
+
+function appendMessageToChat(messageContent) {
+    const chatDiv = document.getElementById('chat');
+    const messageElement = document.createElement('div');
+    messageElement.innerText = messageContent;
+    chatDiv.appendChild(messageElement);
 }
 
 function sendMessage() {
     const messageInput = document.getElementById("message");
-    const chatDiv = document.getElementById('chat');
     if (!messageInput.value || !currentGroupId) return;
 
     axios.post(`/group-chat/${currentGroupId}/send`, {
         groupId: currentGroupId,
         message: messageInput.value
-    }).then(response => {
-        console.log('Message envoyé', response);
-        const messageElement = document.createElement('div');
-        messageElement.innerText = messageInput.value;
-        chatDiv.appendChild(messageElement);
-        messageInput.value = '';
-    }).catch(error => {
-        console.error('Erreur d\'envoi', error);
-    });
+    })
+        .then(() => {
+            console.log('Message envoyé');
+            messageInput.value = '';
+        })
+        .catch(error => {
+            console.error('Erreur d\'envoi', error);
+        });
+
+
 }
 
-
-
-
-
-// Fonction pour gérer la soumission du formulaire de création de groupe
 function createGroup() {
     const groupName = document.getElementById('groupName').value;
     if (!groupName) {
@@ -134,16 +168,11 @@ function createGroup() {
         return;
     }
 
-    axios.post('/create-group', {
-        groupName: groupName,
-        userIds: selectedUsers
-    })
-        .then(response => {
-            console.log('Groupe créé avec succès', response);
-            // Réinitialiser le formulaire et la sélection
+    axios.post('/create-group', { groupName, userIds: selectedUsers })
+        .then(() => {
+            console.log('Groupe créé avec succès');
             document.getElementById('groupName').value = '';
             selectedUsers = [];
-            // Désélectionner toutes les cases à cocher
             document.querySelectorAll('#userList input[type="checkbox"]').forEach(checkbox => checkbox.checked = false);
         })
         .catch(error => {

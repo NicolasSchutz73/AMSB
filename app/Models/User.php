@@ -63,7 +63,7 @@ class User extends Authenticatable
      * @param int $groupId L'ID du groupe à vérifier.
      * @return bool Retourne true si l'utilisateur est membre du groupe, sinon false.
      */
-    public function isMemberOfGroup($groupId)
+    public function isMemberOfGroup( $groupId): bool
     {
         return $this->groups()->where('groups.id', $groupId)->exists();
     }

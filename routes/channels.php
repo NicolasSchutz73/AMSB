@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Group;
+use App\Models\User;
 use Illuminate\Support\Facades\Broadcast;
 
 /*
@@ -27,8 +29,14 @@ Broadcast::channel('groups.{group}', function ($user, Group $group) {
 });
 
 Broadcast::channel('group.{groupId}', function ($user, $groupId) {
-    return $user->isMemberOfGroup($groupId); // Assure-toi que cette méthode existe
+    return $user->isMemberOfGroup($groupId);
 });
+
+Broadcast::channel('group.{groupId}', function ($user, $groupId) {
+    \Log::info("Attempt to access group channel: Group ID - $groupId, User ID - {$user->id}");
+    return true; // Temporairement pour tester
+});
+
 
 
 

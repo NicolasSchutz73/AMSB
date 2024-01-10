@@ -21,7 +21,7 @@ class GroupChatMessageEvent implements ShouldBroadcast
         $this->message = $message;
     }
 
-    public function broadcastOn()
+    public function broadcastOn(): PrivateChannel
     {
         return new PrivateChannel('group.' . $this->groupId);
     }

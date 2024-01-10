@@ -15,8 +15,14 @@
     <div id="userList">
         <!-- La liste des utilisateurs sera chargée ici -->
     </div>
+
+    <!-- Liste des groupes de l'utilisateur -->
+    <h2>Mes Groupes</h2>
+    <div id="groupList"></div>
 </div>
 
 @vite('resources/js/chatRoom/app.js')
+@vite('resources/js/bootstrap.js')
+
 </body>
 </html>

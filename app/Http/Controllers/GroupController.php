@@ -30,5 +30,14 @@ class GroupController extends Controller
         // Retourner une réponse, par exemple
         return response()->json(['success' => 'Groupe créé avec succès', 'group' => $group]);
     }
+
+
+    public function getUserGroups(Request $request)
+    {
+        $user = $request->user();
+        $groups = $user->groups; // Assure-toi que la relation 'groups' est définie dans le modèle User
+
+        return response()->json(['groups' => $groups]);
+    }
 }
 

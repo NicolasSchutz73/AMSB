@@ -28,12 +28,16 @@ class ChatController extends Controller
      */
     public function store(Request $request)
     {
-        event(new ChatMessageEvent($request->nickname, $request->message));
+        // Assure-toi que le groupe ID est transmis avec la requête
+        $groupId = $request->input('groupId');
+        $message = $request->input('message');
 
-        return response()->json([
-            'success'=>'chat message sent'
-        ]);
+        // Diffuse le message sur le canal du groupe
+        event(new GroupChatMessageEvent($groupId, $message));
+
+        return response()->json(['success' => 'Message envoyé']);
     }
+
 
     /**
      * Display the specified resource.

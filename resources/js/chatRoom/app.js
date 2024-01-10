@@ -3,6 +3,16 @@ import axios from "axios";
 let selectedUsers = [];
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Charge les utilisateurs pour créer un groupe
+    loadUsers();
+
+    // Charge les groupes auxquels l'utilisateur appartient
+    loadUserGroups();
+
+    document.getElementById('createGroupButton').addEventListener('click', createGroup);
+});
+
+function loadUsers() {
     axios.get('../users')
         .then(response => {
             const users = response.data.data || response.data;
@@ -31,11 +41,27 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => console.error(error));
+}
 
-    document.getElementById('createGroupButton').addEventListener('click', createGroup);
+function loadUserGroups() {
+    axios.get('/api/user-groups').then(response => {
+        const groups = response.data.groups;
+        const groupList = document.getElementById('groupList');
 
-});
+        groups.forEach(group => {
+            const groupElement = document.createElement('div');
+            groupElement.innerText = group.name;
+            groupList.appendChild(groupElement);
 
+            // Écoute sur les canaux des groupes
+            window.Echo.private(`group.${group.id}`)
+                .listen('.GroupChatMessageEvent', (e) => {
+                    console.log(e.message);
+                    // Affiche le message dans l'interface utilisateur
+                });
+        });
+    }).catch(error => console.error('Erreur lors de la récupération des groupes', error));
+}
 
 // Fonction pour gérer la soumission du formulaire de création de groupe
 function createGroup() {

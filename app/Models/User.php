@@ -52,8 +52,19 @@ class User extends Authenticatable
         return $this->belongsToMany((Course::class));
     }
 
-    public function groups(): BelongsToMany
+    public function groups()
     {
-        return $this->belongsToMany(Group::class)->withTimestamps();
+        return $this->belongsToMany(Group::class);
+    }
+
+    /**
+     * Vérifie si l'utilisateur est membre d'un groupe spécifique.
+     *
+     * @param int $groupId L'ID du groupe à vérifier.
+     * @return bool Retourne true si l'utilisateur est membre du groupe, sinon false.
+     */
+    public function isMemberOfGroup($groupId)
+    {
+        return $this->groups()->where('groups.id', $groupId)->exists();
     }
 }

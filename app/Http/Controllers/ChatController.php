@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Events\ChatMessageEvent;
+use App\Events\GroupChatMessageEvent;
+use App\Models\Message;
 use Illuminate\Http\Request;
 
 class ChatController extends Controller
@@ -28,15 +30,22 @@ class ChatController extends Controller
      */
     public function store(Request $request)
     {
-        // Assure-toi que le groupe ID est transmis avec la requête
         $groupId = $request->input('groupId');
-        $message = $request->input('message');
+        $messageText = $request->input('message');
+
+        // Créer et enregistrer le message
+        $message = new Message();
+        $message->group_id = $groupId; // Assurez-vous que cette valeur n'est pas nulle
+        $message->user_id = auth()->id();
+        $message->content = $messageText;
+        $message->save();
 
         // Diffuse le message sur le canal du groupe
         event(new GroupChatMessageEvent($groupId, $message));
 
         return response()->json(['success' => 'Message envoyé']);
     }
+
 
 
     /**

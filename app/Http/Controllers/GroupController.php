@@ -39,5 +39,12 @@ class GroupController extends Controller
 
         return response()->json(['groups' => $groups]);
     }
+
+    public function getMessages(Group $group)
+    {
+        $messages = $group->messages()->with('user')->get();
+        return response()->json(['messages' => $messages]);
+    }
+
 }
 

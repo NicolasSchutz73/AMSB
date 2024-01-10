@@ -57,6 +57,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::resource('groups', GroupController::class);
     Route::resource('conversations', ConversationController::class);
+    Route::post('/group-chat/{groupId}/send', [ChatController::class, 'store']);
+
 
 
 });
@@ -67,6 +69,8 @@ Route::get('/chat-room-users', [UserController::class, 'chatRoomUsers'])
 // Utilise ce code dans routes/api.php pour une réponse JSON
 Route::get('/users', [UserController::class, 'apiIndex']);
 Route::post('/create-group', [GroupController::class, 'store'])->middleware('auth');
+
+
 
 
 require __DIR__.'/auth.php';

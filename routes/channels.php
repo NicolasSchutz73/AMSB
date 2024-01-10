@@ -30,3 +30,5 @@ Broadcast::channel('group.{groupId}', function ($user, $groupId) {
     return $user->isMemberOfGroup($groupId); // Assure-toi que cette méthode existe
 });
 
+
+

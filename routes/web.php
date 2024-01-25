@@ -37,10 +37,6 @@ Route::get('/chat-room', function () {
     return view('chatRoom');
 })->middleware(['auth', 'verified'])->name('chat-room');
 
-
-
-
-
 // Routes des ressources pour les rôles et utilisateurs et chat
 Route::resources([
     'roles' => RoleController::class, // Ressources pour la gestion des rôles
@@ -59,19 +55,15 @@ Route::middleware('auth')->group(function () {
     Route::resource('conversations', ConversationController::class);
     Route::post('/group-chat/{groupId}/send', [ChatController::class, 'store']);
     Route::get('/groups/{group}/messages', [GroupController::class, 'getMessages']);
-
-
-
 });
 
 Route::get('/chat-room-users', [UserController::class, 'chatRoomUsers'])
     ->middleware(['auth', 'verified'])
     ->name('chat-room-users');
+
+
 // Utilise ce code dans routes/api.php pour une réponse JSON
-Route::get('/users', [UserController::class, 'apiIndex']);
+Route::get('/usersjson', [UserController::class, 'apiIndex']); // y déplacer dans api.php
 Route::post('/create-group', [GroupController::class, 'store'])->middleware('auth');
-
-
-
 
 require __DIR__.'/auth.php';

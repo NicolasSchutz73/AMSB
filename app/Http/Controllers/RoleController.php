@@ -60,8 +60,7 @@ class RoleController extends Controller
 
         $role->syncPermissions($permissions);
 
-        return redirect()->route('roles.index')
-            ->withSuccess('New role is added successfully.');
+        return redirect()->route('roles.index');
     }
 
     /**
@@ -119,8 +118,7 @@ class RoleController extends Controller
 
         $role->syncPermissions($permissions);
 
-        return redirect()->back()
-            ->withSuccess('Role is updated successfully.');
+        return redirect()->route("roles.index");
     }
 
     /**
@@ -137,7 +135,6 @@ class RoleController extends Controller
             abort(403, 'CAN NOT DELETE SELF ASSIGNED ROLE');
         }
         $role->delete();
-        return redirect()->route('roles.index')
-            ->withSuccess('Role is deleted successfully.');
+        return redirect()->route("roles.index");
     }
 }

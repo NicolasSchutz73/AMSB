@@ -1,35 +1,31 @@
-<!-- TODO : modifier le style, et pouvoir choisir plusieurs permissions dans le tableau déroulant  -->
-
 <x-app-layout>
     <x-slot name="header">
-        <div class="float-left">
-            <label for="Add New Role" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">Add New Role</label>
-        </div>
-        <div class="float-right">
-            <a href="{{ route('roles.index') }}" class="bg-blue-500 text-white py-1 px-3 rounded text-sm">&larr; Back</a>
+        <div class="flex items-center justify-between">
+            <h2 class="font-semibold text-xl text-white leading-tight">
+                Créer un nouveau rôle
+            </h2>
+
+            <a href="{{ route('roles.index') }}" class="inline-flex items-center justify-center bg-blue-500 text-white py-2 px-4 rounded text-base">&larr; Retour</a>
         </div>
     </x-slot>
-
-    <div class="flex justify-center my-6">
-        <div class="w-full md:w-2/3 lg:w-1/2">
-            <div class="bg-white dark:bg-gray-800 shadow rounded px-8 pt-6 pb-8 mb-4">
+    <div class="flex justify-center my-8">
+        <div class="w-8/12">
+            <div class="p-6 bg-white shadow rounded">
                 <form action="{{ route('roles.store') }}" method="post">
                     @csrf
 
-                    <div class="mb-4 flex flex-wrap">
-                        <label for="name" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 block w-full md:w-1/3 px-3 mb-2 md:mb-0 md:text-right">Name</label>
-                        <div class="w-full md:w-2/3">
-                            <input type="text" class="form-input w-full @error('name') border-red-500 @enderror" id="name" name="name" value="{{ old('name') }}">
-                            @error('name')
-                            <p class="text-red-500 text-xs italic">{{ $message }}</p>
-                            @enderror
-                        </div>
+                    <div class="mb-4">
+                        <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Nom</label>
+                        <input type="text" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md  @error('name') border-red-500 @enderror" id="name" name="name" value="{{ old('name') }}">
+                        @error('name')
+                        <p class="text-red-500 text-xs italic">{{ $message }}</p>
+                        @enderror
                     </div>
 
-                    <div class="mb-4 flex flex-wrap">
-                        <label for="permissions" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 block w-full md:w-1/3 px-3 mb-2 md:mb-0 md:text-right">Permissions</label>
-                        <div class="w-full md:w-2/3">
-                            <select class="form-multiselect block w-full @error('permissions') border-red-500 @enderror" multiple id="permissions" name="permissions[]">
+                    <div class="mb-4">
+                        <label for="permissions" class="block text-md font-medium text-gray-700">Permissions</label>
+                        <div class="mt-1">
+                            <select class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('permissions') border-red-500 @enderror" multiple id="permissions" name="permissions[]" style="height: 210px;">
                                 @forelse ($permissions as $permission)
                                     <option value="{{ $permission->id }}" {{ in_array($permission->id, old('permissions') ?? []) ? 'selected' : '' }}>
                                         {{ $permission->name }}
@@ -42,9 +38,13 @@
                             <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
+
                     </div>
-                    <div class="flex justify-center mb-4">
-                        <input type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer" value="Add Role">
+
+                    <div class="flex items-center justify-between">
+                        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                            Créer le rôle
+                        </button>
                     </div>
                 </form>
             </div>

@@ -2,15 +2,15 @@
 
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Manage Users
+        <h2 class="font-semibold text-xl text-white leading-tight">
+            Gérer les utilisateurs
         </h2>
     </x-slot>
 
     <div class="p-6">
         @can('create-user')
-            <a href="{{ route('users.create') }}" class="inline-flex items-center justify-center px-4 py-2 bg-green-500 text-white rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 mt-3 sm:mt-0">
-                Add New User
+            <a href="{{ route('users.create') }}" class="inline-flex items-center justify-center px-4 py-2 border border-white text-white rounded-md shadow-sm hover:bg-white hover:text-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white sm:ml-3 mt-3 sm:mt-0 mb-4">
+                Ajouter un utilisateur
             </a>
         @endcan
         <table class="w-full table-auto bg-white rounded">

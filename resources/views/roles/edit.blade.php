@@ -1,29 +1,22 @@
-<!-- TODO modifier le style, ajouter une popup au clic ou un messgae pour confirmer la modif -->
-
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between p-4">
-            <div>
-                <label for="Edit Role" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
-                    Edit Role
-                </label>
-            </div>
-            <div>
-                <a href="{{ route('roles.index') }}" class="text-sm bg-blue-500 text-white py-2 px-4 rounded">
-                    &larr; Back
-                </a>
-            </div>
+        <div class="flex items-center justify-between">
+            <h2 class="font-semibold text-xl text-white leading-tight">
+                Modifier le rôle
+            </h2>
+
+            <a href="{{ route('roles.index') }}" class="inline-flex items-center justify-center bg-blue-500 text-white py-2 px-4 rounded text-base">&larr; Retour</a>
         </div>
     </x-slot>
     <div class="flex justify-center mt-8">
         <div class="w-8/12">
-            <div class="p-6">
+            <div class="p-6 bg-white shadow rounded">
                 <form action="{{ route('roles.update', $role->id) }}" method="post">
                     @csrf
                     @method("PUT")
 
                     <div class="mb-4">
-                        <label for="name" class="block text-md font-medium text-gray-500">Name</label>
+                        <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Nom</label>
                         <div class="mt-1">
                             <input type="text" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('name') border-red-500 @enderror" id="name" name="name" value="{{ $role->name }}">
                             @if ($errors->has('name'))
@@ -50,10 +43,11 @@
                         </div>
                     </div>
 
-                    <div class="flex justify-end">
-                        <input type="submit" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" value="Update Role">
+                    <div class="flex items-center justify-between">
+                        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                            Modifier le rôle
+                        </button>
                     </div>
-
                 </form>
             </div>
         </div>

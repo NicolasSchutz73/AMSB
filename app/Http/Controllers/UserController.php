@@ -31,11 +31,9 @@ class UserController extends Controller
      */
     public function index(): View
     {
-
         return view('users.index', [
             'users' => User::latest('id')->paginate(3)
         ]);
-
 
     }
 
@@ -63,8 +61,7 @@ class UserController extends Controller
         $user = User::create($input);
         $user->assignRole($request->roles);
 
-        return redirect()->route('users.index')
-            ->withSuccess('New user is added successfully.');
+        return redirect()->route('users.index');
     }
 
     /**
@@ -120,8 +117,7 @@ class UserController extends Controller
 
         $user->syncRoles($request->roles);
 
-        return redirect()->back()
-            ->withSuccess('User is updated successfully.');
+        return redirect()->route('users.index');
     }
 
     /**
@@ -139,8 +135,7 @@ class UserController extends Controller
 
         $user->syncRoles([]);
         $user->delete();
-        return redirect()->route('users.index')
-            ->withSuccess('User is deleted successfully.');
+        return redirect()->route('users.index');
     }
 
 

@@ -6,7 +6,9 @@
     </x-slot>
     <div class="p-6">
         @can('create-role')
-            <a href="{{ route('roles.create') }}" class="inline-flex items-center justify-center px-4 py-2 border border-white text-white rounded-md shadow-sm hover:bg-white hover:text-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white sm:ml-3 mt-3 sm:mt-0 mb-4">Créer un rôle</a>
+            <a href="{{ route('roles.create') }}" class="inline-flex items-center justify-center px-4 py-2 border border-white text-white rounded-md shadow-sm hover:bg-white hover:text-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white sm:ml-3 mt-3 sm:mt-0 mb-4">
+                Ajouter un rôle
+            </a>
         @endcan
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
@@ -26,16 +28,16 @@
                                 @csrf
                                 @method('DELETE')
 
-                                <a href="{{ route('roles.show', $role->id) }}" class="inline-flex items-center bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-200 ease-in-out">Voir</a>
+                                <a href="{{ route('roles.show', $role->id) }}" class="inline-flex items-center justify-center px-4 py-2 bg-yellow-500 text-white rounded-md shadow-sm hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 sm:ml-3 mt-3 sm:mt-0">Voir</a>
 
                                 @if ($role->name != 'Super Admin')
                                     @can('edit-role')
-                                        <a href="{{ route('roles.edit', $role->id) }}" class="inline-flex items-center bg-green-500 text-white rounded-md px-4 py-2 hover:bg-green-600 transition duration-200 ease-in-out">Modifier</a>
+                                        <a href="{{ route('roles.edit', $role->id) }}" class="inline-flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 mt-3 sm:mt-0">Modifier</a>
                                     @endcan
 
                                     @can('delete-role')
                                         @if ($role->name != Auth::user()->hasRole($role->name))
-                                            <button type="submit" class="inline-flex items-center bg-red-500 text-white rounded-md px-4 py-2 hover:bg-red-600 transition duration-200 ease-in-out" onclick="return confirm('Voulez-vous supprimer ce rôle ?');">Supprimer</button>
+                                            <button type="submit" class="inline-flex items-center justify-center px-4 py-2 bg-red-500 text-white rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 mt-3 sm:mt-0" onclick="return confirm('Voulez-vous supprimer ce rôle ?');">Supprimer</button>
                                         @endif
                                     @endcan
                                 @endif

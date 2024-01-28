@@ -6,7 +6,7 @@
     </x-slot>
     <div class="p-6">
         @can('create-role')
-            <a href="{{ route('roles.create') }}" class="inline-flex items-center justify-center px-4 py-2 border border-white text-white rounded-md shadow-sm hover:bg-white hover:text-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white sm:ml-3 mt-3 sm:mt-0 mb-4">Add New Role</a>
+            <a href="{{ route('roles.create') }}" class="inline-flex items-center justify-center px-4 py-2 border border-white text-white rounded-md shadow-sm hover:bg-white hover:text-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white sm:ml-3 mt-3 sm:mt-0 mb-4">Créer un rôle</a>
         @endcan
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">

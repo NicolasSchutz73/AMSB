@@ -4,10 +4,10 @@
     <x-slot name="header">
         <div class="flex justify-between">
             <label for="Edit User" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
-                Edit User
+                Modifier l'utilisateur
             </label>
             <div>
-                <a href="{{ route('users.index') }}" class="bg-blue-500 text-white py-1 px-3 rounded text-sm">&larr; Back</a>
+                <a href="{{ route('users.index') }}" class="bg-blue-500 text-white py-1 px-3 rounded text-sm">&larr; Retour</a>
             </div>
         </div>
     </x-slot>
@@ -18,7 +18,7 @@
             @method("PUT")
 
             <div class="mb-4">
-                <label for="firstname" class="text-gray-500 dark:text-gray-400 block text-md-end text-start">Firstname</label>
+                <label for="firstname" class="text-gray-500 dark:text-gray-400 block text-md-end text-start">Prénom</label>
                 <div>
                     <input type="text" class="w-full px-3 py-2 border rounded-lg @error('firstname') border-red-500 @enderror" id="firstname" name="firstname" value="{{ $user->firstname }}">
                     @if ($errors->has('firstname'))
@@ -28,7 +28,7 @@
             </div>
 
             <div class="mb-4">
-                <label for="lastname" class="text-gray-500 dark:text-gray-400 block text-md-end text-start">Lastname</label>
+                <label for="lastname" class="text-gray-500 dark:text-gray-400 block text-md-end text-start">Nom</label>
                 <div>
                     <input type="text" class="w-full px-3 py-2 border rounded-lg @error('lastname') border-red-500 @enderror" id="lastname" name="lastname" value="{{ $user->lastname }}">
                     @if ($errors->has('lastname'))
@@ -38,7 +38,7 @@
             </div>
 
             <div class="mb-4">
-                <label for="email" class="text-gray-500 dark:text-gray-400 block text-md-end text-start">Email Address</label>
+                <label for="email" class="text-gray-500 dark:text-gray-400 block text-md-end text-start">E-mail</label>
                 <div>
                     <input type="email" class="w-full px-3 py-2 border rounded-lg @error('email') border-red-500 @enderror" id="email" name="email" value="{{ $user->email }}">
                     @if ($errors->has('email'))
@@ -48,7 +48,7 @@
             </div>
 
             <div class="mb-4">
-                <label for="password" class="text-gray-500 dark:text-gray-400 block text-md-end text-start">Password</label>
+                <label for="password" class="text-gray-500 dark:text-gray-400 block text-md-end text-start">Mot de passe</label>
                 <div>
                     <input type="password" class="w-full px-3 py-2 border rounded-lg @error('password') border-red-500 @enderror" id="password" name="password">
                     @if ($errors->has('password'))
@@ -58,14 +58,14 @@
             </div>
 
             <div class="mb-4">
-                <label for="password_confirmation" class="text-gray-500 dark:text-gray-400 block text-md-end text-start">Confirm Password</label>
+                <label for="password_confirmation" class="text-gray-500 dark:text-gray-400 block text-md-end text-start">Confirmation du mot de passe</label>
                 <div>
                     <input type="password" class="w-full px-3 py-2 border rounded-lg" id="password_confirmation" name="password_confirmation">
                 </div>
             </div>
 
             <div class="mb-4">
-                <label for="roles" class="text-gray-500 dark:text-gray-400 block text-md-end text-start">Roles</label>
+                <label for="roles" class="text-gray-500 dark:text-gray-400 block text-md-end text-start">Rôles</label>
                 <div>
                     <select class="w-full px-3 py-2 border rounded-lg @error('roles') border-red-500 @enderror" multiple aria-label="Roles" id="roles" name="roles[]">
                         @forelse ($roles as $role)
@@ -90,7 +90,7 @@
             </div>
 
             <div class="mb-4">
-                <input type="submit" class="w-full px-3 py-2 bg-blue-500 text-white rounded-lg" value="Update User">
+                <input type="submit" class="w-full px-3 py-2 bg-blue-500 text-white rounded-lg" value="Mettre à jour l'utilisateur">
             </div>
 
         </form>

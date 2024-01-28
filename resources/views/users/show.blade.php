@@ -4,10 +4,10 @@
     <x-slot name="header">
         <div class="flex justify-between">
             <label for="User Information" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
-                User Information
+                Information de l'utilisateur
             </label>
             <div>
-                <a href="{{ route('users.index') }}" class="bg-blue-500 text-white py-1 px-3 rounded text-sm">&larr; Back</a>
+                <a href="{{ route('users.index') }}" class="bg-blue-500 text-white py-1 px-3 rounded text-sm">&larr; Retour</a>
             </div>
         </div>
     </x-slot>
@@ -16,7 +16,7 @@
 
         <div class="mb-4">
             <label for="firstname" class="text-gray-500 dark:text-gray-400 block text-md-end text-start">
-                <strong>Firstname :</strong>
+                <strong>Prénom :</strong>
             </label>
             <div class="mt-1 text-gray-500 dark:text-gray-40">
                 {{ $user->firstname }}
@@ -25,7 +25,7 @@
 
         <div class="mb-4">
             <label for="lastname" class="text-gray-500 dark:text-gray-400 block text-md-end text-start">
-                <strong>Lastname :</strong>
+                <strong>Nom :</strong>
             </label>
             <div class="mt-1 text-gray-500 dark:text-gray-40">
                 {{ $user->lastname }}
@@ -33,14 +33,14 @@
         </div>
 
         <div class="mb-4">
-            <label for="email" class="text-gray-500 dark:text-gray-400 block text-md-end text-start"><strong>Email Address:</strong></label>
+            <label for="email" class="text-gray-500 dark:text-gray-400 block text-md-end text-start"><strong>E-mail :</strong></label>
             <div class="mt-1 text-gray-500 dark:text-gray-40">
                 {{ $user->email }}
             </div>
         </div>
 
         <div class="mb-4">
-            <label for="roles" class="text-gray-500 dark:text-gray-400 block text-md-end text-start"><strong>Roles:</strong></label>
+            <label for="roles" class="text-gray-500 dark:text-gray-400 block text-md-end text-start"><strong>Rôles :</strong></label>
             <div class="mt-1">
                 @forelse ($user->getRoleNames() as $role)
                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">{{ $role }}</span>

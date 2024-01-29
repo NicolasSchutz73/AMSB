@@ -9,7 +9,7 @@
     </x-slot>
     <div class="p-6">
         <div class="px-6 py-2">
-            <div>
+            <div class="pb-4">
                 <label for="name" class="text-gray-400 text-left">
                     <strong>Nom du rôle :</strong>
                 </label>
@@ -17,7 +17,7 @@
                     {{ $role->name }}
                 </div>
             </div>
-            <div>
+            <div class="pb-4">
                 <label for="roles" class="text-gray-400 text-left">
                     <strong>Permissions attribuées:</strong>
                 </label>

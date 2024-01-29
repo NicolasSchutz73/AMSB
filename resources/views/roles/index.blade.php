@@ -6,7 +6,7 @@
     </x-slot>
     <div class="p-6">
         @can('create-role')
-            <a href="{{ route('roles.create') }}" class="inline-flex items-center justify-center px-4 py-2 border border-white text-white rounded-md shadow-sm hover:bg-white hover:text-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white sm:ml-3 mt-3 sm:mt-0 mb-4">
+            <a href="{{ route('roles.create') }}" class="inline-flex items-center justify-center px-4 py-2 border border-white text-white rounded-md shadow-sm hover:bg-white hover:text-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white mt-3 sm:mt-0 mb-4">
                 Ajouter un rôle
             </a>
         @endcan
@@ -29,10 +29,10 @@
                     <tbody>
                     @forelse ($roles as $role)
                         <tr class="bg-white border-b hover:bg-gray-50">
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-4 text-gray-500">
                                 {{ $loop->iteration }}
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-4 text-gray-500">
                                 {{ $role->name }}
                             </td>
                             <td class="px-6 py-4">

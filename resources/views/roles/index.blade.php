@@ -10,49 +10,60 @@
                 Ajouter un rôle
             </a>
         @endcan
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Action</th>
-                </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                @forelse ($roles as $role)
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $loop->iteration }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $role->name }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap flex justify-between">
-                            <form action="{{ route('roles.destroy', $role->id) }}" method="post">
-                                @csrf
-                                @method('DELETE')
+            <div class="relative overflow-x-auto sm:rounded-lg">
 
-                                <a href="{{ route('roles.show', $role->id) }}" class="inline-flex items-center justify-center px-4 py-2 bg-yellow-500 text-white rounded-md shadow-sm hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 sm:ml-3 mt-3 sm:mt-0">Voir</a>
+                <table class="w-full text-sm text-left rtl:text-right text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">
+                                ID
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Nom
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @forelse ($roles as $role)
+                        <tr class="bg-white border-b hover:bg-gray-50">
+                            <td class="px-6 py-4">
+                                {{ $loop->iteration }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ $role->name }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <form action="{{ route('roles.destroy', $role->id) }}" method="post">
+                                    @csrf
+                                    @method('DELETE')
+                                    <a href="{{ route('roles.show', $role->id) }}" class="font-medium text-yellow-500 hover:underline pr-4">Voir</a>
+                                    @if ($role->name != 'Super Admin')
+                                        @can('edit-role')
+                                            <a href="{{ route('roles.edit', $role->id) }}" class="font-medium text-blue-500 hover:underline pr-4">Modifier</a>
+                                        @endcan
 
-                                @if ($role->name != 'Super Admin')
-                                    @can('edit-role')
-                                        <a href="{{ route('roles.edit', $role->id) }}" class="inline-flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 mt-3 sm:mt-0">Modifier</a>
-                                    @endcan
-
-                                    @can('delete-role')
-                                        @if ($role->name != Auth::user()->hasRole($role->name))
-                                            <button type="submit" class="inline-flex items-center justify-center px-4 py-2 bg-red-500 text-white rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 mt-3 sm:mt-0" onclick="return confirm('Voulez-vous supprimer ce rôle ?');">Supprimer</button>
-                                        @endif
-                                    @endcan
-                                @endif
-                            </form>
+                                        @can('delete-role')
+                                            @if ($role->name != Auth::user()->hasRole($role->name))
+                                                <button type="submit" class="font-medium text-red-500 hover:underline pr-4" onclick="return confirm('Voulez-vous supprimer ce rôle ?');">Supprimer</button>
+                                            @endif
+                                        @endcan
+                                    @endif
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <td colspan="3" class="px-6 py-4 whitespace-nowrap">
+                    <span class="text-danger">
+                        <strong>Aucun rôle trouver !</strong>
+                    </span>
                         </td>
-                    </tr>
-                @empty
-                    <td colspan="3" class="px-6 py-4 whitespace-nowrap">
-                <span class="text-danger">
-                    <strong>Aucun rôle trouver !</strong>
-                </span>
-                    </td>
-                @endforelse
-                </tbody>
-            </table>
+                    @endforelse
+                    </tbody>
+                </table>
+            </div>
         {{ $roles->links() }}
     </div>
 </x-app-layout>

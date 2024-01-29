@@ -33,6 +33,13 @@ Route::get('/calendar', function () {
     return view('calendar');
 })->middleware(['auth', 'verified'])->name('calendar');
 
+Route::get('/notification', function () {
+    return view('notification');
+})->middleware(['auth', 'verified'])->name('notification');
+
+Route::post('/save-token', [App\Http\Controllers\HomeController::class, 'saveToken'])->name('save-token');
+Route::post('/send-notification', [App\Http\Controllers\HomeController::class, 'sendNotification'])->name('send.notification');
+
 Route::get('/chat-room', function () {
     return view('chatRoom');
 })->middleware(['auth', 'verified'])->name('chat-room');

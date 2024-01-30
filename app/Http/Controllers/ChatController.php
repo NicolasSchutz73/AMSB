@@ -49,6 +49,8 @@ class ChatController extends Controller
 
 
 
+
+
     /**
      * Display the specified resource.
      */

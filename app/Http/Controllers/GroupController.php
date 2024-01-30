@@ -43,8 +43,29 @@ class GroupController extends Controller
     public function getMessages(Group $group)
     {
         $messages = $group->messages()->with('user')->get();
-        return response()->json(['messages' => $messages]);
+
+        // Transformer les messages pour inclure l'ID de l'utilisateur
+        $transformedMessages = $messages->map(function ($message) {
+            return [
+                'id' => $message->id,
+                'content' => $message->content,
+                'user_id' => $message->user->id, // Récupération de l'ID de l'utilisateur
+                'user_name' => $message->user->name // Vous pouvez également inclure d'autres informations utilisateur si nécessaire
+            ];
+        });
+
+        return response()->json(['messages' => $transformedMessages]);
+    }
+
+
+    public function chatRoom()
+    {
+        $users = User::all(); // Déjà présent
+        $groups = Group::all(); // Récupérer tous les groupes ou filtrer selon la logique de votre application
+
+        return view('chatRoom', ['users' => $users, 'groups' => $groups]);
     }
 
 }
+
 

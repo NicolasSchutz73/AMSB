@@ -3,7 +3,8 @@ import Echo from 'laravel-echo';
 
 let currentGroupId = null;
 let groupChannels = {};
-
+let globalFirstname = '';
+let globalLastname = '';
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('btn_affiche_user').addEventListener('click', openModal);
     document.getElementById('btn_fermer_modal_').addEventListener('click', closeModal);
@@ -20,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     loadUserGroups();
+    getUserInfo();
 
 });
 
@@ -187,16 +189,17 @@ function loadPreviousMessages(groupId) {
     axios.get(`/group-chat/${groupId}/messages`)
         .then(response => {
             const messages = response.data.messages;
-            console.log(messages)
-            const chatDiv = document.querySelector('.grid.grid-cols-12.gap-y-2'); // Sélection de la grille où afficher les messages
+            const chatDiv = document.querySelector('.grid.grid-cols-12.gap-y-2');
             chatDiv.innerHTML = ''; // Efface les messages précédents avant de charger les nouveaux
 
             messages.forEach(message => {
-                appendMessageToChat(message.content, message.author); // Assurez-vous que ces propriétés correspondent à votre objet de message
+                // Vérifiez que vous avez bien les propriétés user_firstname et user_lastname dans chaque message
+                appendMessageToChat(message.content, message.user_firstname, message.user_lastname);
             });
         })
         .catch(error => console.error('Erreur lors du chargement des messages', error));
 }
+
 
 function joinGroupChat(groupId, groupName) {
     if (currentGroupId && groupChannels[currentGroupId]) {
@@ -228,7 +231,8 @@ function subscribeToGroupChannel(groupId) {
     if (!groupChannels[groupId]) {
         groupChannels[groupId] = window.Echo.private(`group.${groupId}`)
             .listen('.NewMessage', (e) => {
-                appendMessageToChat(e.message.content, e.message.author);
+                appendMessageToChat(e.message.content, e.message.user_firstname, e.message.lastname);
+                console.log(e.message.content, e.message.user_firstname, e.message.lastname)
                 // Assurez-vous que ces propriétés correspondent à votre objet de message
             });
     }
@@ -237,8 +241,21 @@ function subscribeToGroupChannel(groupId) {
 
 
 
+function getUserInfo() {
+    axios.get('/userinfo')
+        .then(response => {
+            // Stocker le prénom et le nom dans les variables globales
+            globalFirstname = response.data.firstname;
+            globalLastname = response.data.lastname;
+            console.log('User info loaded:', globalFirstname, globalLastname);
+        })
+        .catch(error => {
+            console.error('Erreur lors de la récupération des informations de l\'utilisateur', error);
+        });
+}
+
 function sendMessage() {
-    const messageInput = document.querySelector('input[type="text"]'); // Assurez-vous que le sélecteur est correct pour votre champ de saisie de message
+    const messageInput = document.querySelector('input[type="text"]');
     const messageContent = messageInput.value;
 
     if (!messageContent.trim() || !currentGroupId) {
@@ -247,12 +264,12 @@ function sendMessage() {
     }
 
     axios.post(`/group-chat/${currentGroupId}/send`, {
-        groupId: currentGroupId, // Assurez-vous que cette partie de votre API attend `groupId`
+        groupId: currentGroupId,
         message: messageContent
     })
         .then(() => {
-            appendMessageToChat(messageContent, 'Vous'); // 'Vous' ou le nom d'utilisateur actuel
-            messageInput.value = ''; // Efface le champ de saisie après l'envoi
+            appendMessageToChat(messageContent, globalFirstname, globalLastname);
+            messageInput.value = '';
         })
         .catch(error => {
             console.error('Erreur d\'envoi', error);
@@ -260,22 +277,32 @@ function sendMessage() {
 }
 
 
+
+
 // Liez cette fonction au bouton d'envoi ou à l'événement 'submit' du formulaire de message.
 
 
 
-function appendMessageToChat(messageContent, authorName) {
-    console.log(authorName)
-    const chatDiv = document.querySelector('.grid.grid-cols-12.gap-y-2'); // Sélection de la grille où afficher les messages
+function appendMessageToChat(messageContent, authorFirstname, authorLastname) {
+    const chatDiv = document.querySelector('.grid.grid-cols-12.gap-y-2');
     const messageElement = document.createElement('div');
     messageElement.classList.add('col-start-1', 'col-end-8', 'p-3', 'rounded-lg');
+
+    // Vérifie si authorFirstname et authorLastname sont définis
+    const authorInfoText = authorFirstname && authorLastname ? `${authorFirstname} ${authorLastname}` : 'Utilisateur inconnu';
+
+    const authorInfoDiv = document.createElement('div');
+    authorInfoDiv.classList.add('mb-2', 'text', 'italic', 'text-gray-600', 'text-xs');
+    authorInfoDiv.textContent = authorInfoText;
 
     const flexDiv = document.createElement('div');
     flexDiv.classList.add('flex', 'flex-row', 'items-center');
 
+    // Utilisez les initiales de authorFirstname et authorLastname ou utilisez une valeur par défaut si non disponibles
+    const initials = `${authorFirstname ? authorFirstname.charAt(0) : ''}${authorLastname ? authorLastname.charAt(0) : ''}`;
     const authorDiv = document.createElement('div');
-    authorDiv.classList.add('flex', 'items-center', 'justify-center', 'h-10', 'w-10', 'rounded-full', 'bg-indigo-500', 'flex-shrink-0');
-    authorDiv.textContent = authorName; // Utilisez la première lettre du nom comme icône
+    authorDiv.classList.add('flex', 'items-center', 'justify-center', 'h-10', 'w-10', 'rounded-full', 'bg-indigo-500', 'flex-shrink-0', 'text-white', 'font-bold');
+    authorDiv.textContent = initials.toUpperCase() || 'U'; // 'U' pour 'Utilisateur'
 
     const messageContentDiv = document.createElement('div');
     messageContentDiv.classList.add('relative', 'ml-3', 'text-sm', 'bg-white', 'py-2', 'px-4', 'shadow', 'rounded-xl');
@@ -283,10 +310,12 @@ function appendMessageToChat(messageContent, authorName) {
 
     flexDiv.appendChild(authorDiv);
     flexDiv.appendChild(messageContentDiv);
+    messageElement.appendChild(authorInfoDiv);
     messageElement.appendChild(flexDiv);
 
     chatDiv.appendChild(messageElement);
 }
+
 
 
 // Exemple de fonction pour démarrer une conversation (à remplacer par votre logique réelle)

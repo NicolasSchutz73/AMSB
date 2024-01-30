@@ -152,6 +152,20 @@ class UserController extends Controller
         return response()->json($users);
     }
 
+    // Dans votre controller
+    public function getUserInfo()
+    {
+        // Récupération de l'utilisateur actuellement connecté
+        $user = auth()->user();
+
+        // Retourne le prénom et le nom sous forme de tableau associatif
+        return response()->json([
+            'firstname' => $user->firstname,
+            'lastname' => $user->lastname,
+        ]);
+    }
+
+
 
 
 

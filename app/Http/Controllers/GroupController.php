@@ -44,18 +44,20 @@ class GroupController extends Controller
     {
         $messages = $group->messages()->with('user')->get();
 
-        // Transformer les messages pour inclure l'ID de l'utilisateur
+        // Transformer les messages pour inclure les détails de l'utilisateur
         $transformedMessages = $messages->map(function ($message) {
             return [
                 'id' => $message->id,
                 'content' => $message->content,
                 'user_id' => $message->user->id, // Récupération de l'ID de l'utilisateur
-                'user_name' => $message->user->name // Vous pouvez également inclure d'autres informations utilisateur si nécessaire
+                'user_firstname' => $message->user->firstname, // Récupération du prénom de l'utilisateur
+                'user_lastname' => $message->user->lastname, // Récupération du nom de l'utilisateur
             ];
         });
 
         return response()->json(['messages' => $transformedMessages]);
     }
+
 
 
     public function chatRoom()

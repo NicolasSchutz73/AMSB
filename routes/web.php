@@ -56,6 +56,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('conversations', ConversationController::class);
     Route::post('/group-chat/{groupId}/send', [ChatController::class, 'store']);
     Route::get('/group-chat/{group}/messages', [GroupController::class, 'getMessages']);
+    // Dans votre fichier web.php
+    Route::get('/userinfo', [UserController::class, 'getUserInfo'])->middleware('auth');
+
 });
 
 Route::get('/chat-room-users', [UserController::class, 'chatRoomUsers'])

@@ -25,6 +25,10 @@ class UpdateUserRequest extends FormRequest
             'firstname' => 'required|string|max:250',
             'lastname' => 'required|string|max:250',
             'email' => 'required|string|email:rfc,dns|max:250|unique:users,email,'.$this->user->id,
+            'description' => 'nullable|string|max:255',
+            'emergency' => 'nullable|string|max:255',
+            'profile_photo_path' => 'nullable|string|max:255',
+            'document_path' => 'nullable|string|max:255',
             'password' => 'nullable|string|min:8|confirmed',
             'roles' => 'required'
         ];

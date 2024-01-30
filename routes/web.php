@@ -9,6 +9,7 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Storage;
 
 /*
 |--------------------------------------------------------------------------
@@ -65,5 +66,18 @@ Route::get('/chat-room-users', [UserController::class, 'chatRoomUsers'])
 // Utilise ce code dans routes/api.php pour une réponse JSON
 Route::get('/usersjson', [UserController::class, 'apiIndex']); // y déplacer dans api.php
 Route::post('/create-group', [GroupController::class, 'store'])->middleware('auth');
+
+Route::get('storage/profile-photos/{filename}', function ($filename) {
+    $path = '/ASMB/' . $filename;
+
+    if (Storage::disk('ftp')->exists($path)) {
+        $fileContent = Storage::disk('ftp')->get($path);
+        $mimeType = Storage::disk('ftp')->mimeType($path);
+
+        return response($fileContent)->header('Content-Type', $mimeType);
+    }
+
+    abort(404);
+})->where('filename', '.*');
 
 require __DIR__.'/auth.php';

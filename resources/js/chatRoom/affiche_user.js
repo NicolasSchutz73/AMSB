@@ -227,17 +227,29 @@ function joinGroupChat(groupId, groupName) {
     subscribeToGroupChannel(groupId);
 }
 function subscribeToGroupChannel(groupId) {
-    console.log("je suis dasn subscribeToGroupChannel ")
     if (!groupChannels[groupId]) {
         groupChannels[groupId] = window.Echo.private(`group.${groupId}`)
-            .listen('.NewMessage', (e) => {
-                appendMessageToChat(e.message.content, e.message.user_firstname, e.message.lastname);
-                console.log(e.message.content, e.message.user_firstname, e.message.lastname)
-                // Assurez-vous que ces propriétés correspondent à votre objet de message
+            .listen('GroupChatMessageEvent', (e) => {
+                console.log(e.message.content, e.message.firstname, e.message.lastname)
+                appendMessageToChat(e.message.content, e.message.firstname, e.message.lastname);
             });
     }
 }
+/*
 
+function subscribeToGroupChannel(groupId) {
+    console.log('1')
+    if (!groupChannels[groupId]) {
+        console.log(`Abonnement au canal : group.${groupId}`);
+        groupChannels[groupId] =
+            window.Echo.private(`group.${groupId}`)
+                .listen('GroupChatMessageEvent', (e) => {
+                    console.log(`Message reçu sur le canal : group.${groupId}`);
+                    appendMessageToChat(e.message.content, e.message.authorName);
+                });
+    }
+}
+*/
 
 
 
@@ -268,7 +280,7 @@ function sendMessage() {
         message: messageContent
     })
         .then(() => {
-            appendMessageToChat(messageContent, globalFirstname, globalLastname);
+            //appendMessageToChat(messageContent, globalFirstname, globalLastname);
             messageInput.value = '';
         })
         .catch(error => {

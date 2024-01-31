@@ -28,6 +28,8 @@ class ChatController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    // ChatController.php
+
     public function store(Request $request)
     {
         $groupId = $request->input('groupId');
@@ -35,17 +37,21 @@ class ChatController extends Controller
 
         // Créer et enregistrer le message
         $message = new Message();
-        $message->group_id = $groupId; // Assurez-vous que cette valeur n'est pas nulle
+        $message->group_id = $groupId;
         $message->user_id = auth()->id();
         $message->content = $messageText;
         $message->save();
 
-        // Diffuse le message sur le canal du groupe
-        $authorName = auth()->user()->firstname . ' ' . auth()->user()->lastname;
+        // Récupérer le nom complet de l'utilisateur pour l'afficher dans le chat
+        $firstname = auth()->user()->firstname;
+        $lastname = auth()->user()->lastname;
 
-        event(new GroupChatMessageEvent($groupId, $message, $authorName));
+        // Déclenche l'événement de diffusion du message
+        event(new GroupChatMessageEvent($groupId, $message, $firstname,$lastname));
+
         return response()->json(['success' => 'Message envoyé']);
     }
+
 
 
 

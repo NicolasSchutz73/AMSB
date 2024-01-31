@@ -14,14 +14,16 @@ class GroupChatMessageEvent implements ShouldBroadcast
 
     public $groupId;
     public $message;
-    public $authorName;
+    public $firstname;
+    public $lastname;
 
-    public function __construct($groupId, $message, $authorName)
+
+    public function __construct($groupId, $message, $firstname,$lastname)
     {
         $this->groupId = $groupId;
         $this->message = $message;
-        $this->authorName = $authorName;
-    }
+        $this->firstname = $firstname;
+        $this->lastname = $lastname;  }
 
     public function broadcastWith()
     {
@@ -29,9 +31,9 @@ class GroupChatMessageEvent implements ShouldBroadcast
             'message' => [
                 'id' => $this->message->id,
                 'content' => $this->message->content,
-                // autres attributs de message si nécessaire
-            ],
-            'authorName' => $this->authorName,
+                'firstname' => $this->firstname,
+                'lastname' => $this->lastname,],
+
         ];
     }
 

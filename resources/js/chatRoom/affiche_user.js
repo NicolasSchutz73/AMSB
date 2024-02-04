@@ -321,10 +321,12 @@ function startConversation(userId) {
     axios.get(`/check-group/${globalUserId}/${userId}`)
         .then(response => {
             if (response.data.groupId) {
-                // Utilisez le nom du groupe retourné pour rejoindre le bon groupe
+                // Un groupe existant a été trouvé, rejoignez-le
+                console.log("Un groupe existe déjà avec l'ID :" + response.data.groupName)
                 joinGroupChat(response.data.groupId, response.data.groupName);
             } else {
-                // Aucun groupe privé existant, créez-en un nouveau
+                // Aucun groupe n'existe, créez-en un nouveau
+                console.log("Aucun groupe trouvé, en créer un nouveau.");
                 createPrivateGroup(globalUserId, userId);
             }
         })
@@ -336,22 +338,33 @@ function startConversation(userId) {
 }
 
 
-function createPrivateGroup(userOneId, userTwoId) {
-    // Créer un nom de groupe basé sur les ID pour la simplicité, ou vous pouvez le rendre plus descriptif
-    const groupName = `Private_${userOneId}_${userTwoId}`;
 
-    axios.post('/create-group', {
-        groupName: groupName,
-        userIds: [userOneId, userTwoId]
-    })
-        .then(response => {
-            console.log('Conversation privée créée avec succès', response.data.group);
-            joinGroupChat(response.data.group.id, groupName);
+function createPrivateGroup(userOneId, userTwoId) {
+    axios.get(`/api/user-details/${userTwoId}`).then(response => {
+        const otherUser = response.data;
+        console.log(response.data);
+
+        // Construisez le nom du groupe en utilisant le prénom et le nom de l'autre utilisateur.
+        const groupName = `${otherUser.firstname} ${otherUser.lastname}`; // Ajouté le lastname
+
+        axios.post('/create-group', {
+            groupName: groupName,
+            userIds: [userOneId, userTwoId]
         })
-        .catch(error => {
-            console.error('Erreur lors de la création de la conversation privée', error);
-        });
+            .then(response => {
+                console.log('Conversation privée créée avec succès', response.data.group);
+                joinGroupChat(response.data.group.id, groupName);
+            })
+            .catch(error => {
+                console.error('Erreur lors de la création de la conversation privée', error);
+            });
+    }).catch(error => {
+        console.error('Erreur lors de la récupération des informations de l\'utilisateur', error);
+    });
 }
+
+
+
 
 
 

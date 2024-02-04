@@ -71,6 +71,7 @@ class UserController extends Controller
      */
     public function show(User $user): View
     {
+
         return view('users.show', [
             'user' => $user
         ]);
@@ -136,6 +137,19 @@ class UserController extends Controller
         $user->syncRoles([]);
         $user->delete();
         return redirect()->route('users.index');
+    }
+
+    /**
+     * Récupère les détails d'un utilisateur par son ID et retourne les données en JSON.
+     *
+     * @param int $id L'ID de l'utilisateur.
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getUserDetailsById($id)
+    {
+        $user = User::findOrFail($id);
+
+        return response()->json($user);
     }
 
 

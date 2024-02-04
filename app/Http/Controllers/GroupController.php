@@ -70,19 +70,32 @@ class GroupController extends Controller
 
     public function checkPrivateGroup($userOneId, $userTwoId)
     {
-        // Trouver un groupe où seulement ces deux utilisateurs sont présents et qui suit le modèle de nommage spécifique pour les conversations privées.
-        $groupName = "Private_{$userOneId}_{$userTwoId}";
-        $group = Group::where('name', $groupName)->withCount('users')
+        // Trouver les groupes communs aux deux utilisateurs.
+        $groupsUserOne = Group::whereHas('users', function ($query) use ($userOneId) {
+            $query->where('users.id', $userOneId);
+        })->pluck('id');
+
+        $group = Group::whereIn('id', $groupsUserOne)
+            ->whereHas('users', function ($query) use ($userTwoId) {
+                $query->where('users.id', $userTwoId);
+            })
+            ->withCount('users')
             ->having('users_count', '=', 2)
             ->first();
 
+        // Si un tel groupe est trouvé, retournez les détails, y compris l'ID et le nom du groupe
         if ($group) {
-            // Un groupe avec exactement ces deux utilisateurs et le nom spécifique a été trouvé
-            return response()->json(['groupId' => $group->id, 'groupName' => $group->name]);
-        } else {
-            // Aucun groupe trouvé avec exactement ces deux utilisateurs et le nom spécifique
-            return response()->json(['groupId' => null]);
+            return response()->json([
+                'groupId' => $group->id,
+                'groupName' => $group->name
+            ]);
         }
+
+        // Si aucun groupe commun seulement composé de ces deux utilisateurs n'est trouvé, retournez null
+        return response()->json([
+            'groupId' => null,
+            'groupName' => null
+        ]);
     }
 
 

@@ -28,4 +28,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::middleware('auth:sanctum')->get('/user-groups', [GroupController::class, 'getUserGroups']);
 
+// web.php ou api.php
+
+Route::get('/check-group/{userOneId}/{userTwoId}', [GroupController::class, 'checkPrivateGroup']);
 

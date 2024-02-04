@@ -69,6 +69,9 @@ Route::get('/user-groups', [GroupController::class, 'getUserGroups'])
     ->middleware('auth')
     ->name('user-groups');
 
+// web.php ou api.php
+
+Route::get('/check-group/{userOneId}/{userTwoId}', [GroupController::class, 'checkPrivateGroup']);
 
 // Dans web.php ou api.php, selon votre configuration
 

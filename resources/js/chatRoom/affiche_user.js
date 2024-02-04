@@ -5,6 +5,7 @@ let currentGroupId = null;
 let groupChannels = {};
 let globalFirstname = '';
 let globalLastname = '';
+let globalUserId = '';
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('btn_affiche_user').addEventListener('click', openModal);
     document.getElementById('btn_fermer_modal_').addEventListener('click', closeModal);
@@ -235,21 +236,6 @@ function subscribeToGroupChannel(groupId) {
             });
     }
 }
-/*
-
-function subscribeToGroupChannel(groupId) {
-    console.log('1')
-    if (!groupChannels[groupId]) {
-        console.log(`Abonnement au canal : group.${groupId}`);
-        groupChannels[groupId] =
-            window.Echo.private(`group.${groupId}`)
-                .listen('GroupChatMessageEvent', (e) => {
-                    console.log(`Message reçu sur le canal : group.${groupId}`);
-                    appendMessageToChat(e.message.content, e.message.authorName);
-                });
-    }
-}
-*/
 
 
 
@@ -259,6 +245,7 @@ function getUserInfo() {
             // Stocker le prénom et le nom dans les variables globales
             globalFirstname = response.data.firstname;
             globalLastname = response.data.lastname;
+            globalUserId = response.data.id
             console.log('User info loaded:', globalFirstname, globalLastname);
         })
         .catch(error => {
@@ -330,12 +317,42 @@ function appendMessageToChat(messageContent, authorFirstname, authorLastname) {
 
 
 
-// Exemple de fonction pour démarrer une conversation (à remplacer par votre logique réelle)
 function startConversation(userId) {
-    console.log("Démarrer une conversation avec l'utilisateur ID:", userId);
-    // Ajoutez ici votre logique pour démarrer une conversation avec l'utilisateur sélectionné
+    axios.get(`/check-group/${globalUserId}/${userId}`)
+        .then(response => {
+            if (response.data.groupId) {
+                // Utilisez le nom du groupe retourné pour rejoindre le bon groupe
+                joinGroupChat(response.data.groupId, response.data.groupName);
+            } else {
+                // Aucun groupe privé existant, créez-en un nouveau
+                createPrivateGroup(globalUserId, userId);
+            }
+        })
+        .catch(error => {
+            console.error("Erreur lors de la vérification ou de la création du groupe privé", error);
+        });
+
     closeModal();
 }
+
+
+function createPrivateGroup(userOneId, userTwoId) {
+    // Créer un nom de groupe basé sur les ID pour la simplicité, ou vous pouvez le rendre plus descriptif
+    const groupName = `Private_${userOneId}_${userTwoId}`;
+
+    axios.post('/create-group', {
+        groupName: groupName,
+        userIds: [userOneId, userTwoId]
+    })
+        .then(response => {
+            console.log('Conversation privée créée avec succès', response.data.group);
+            joinGroupChat(response.data.group.id, groupName);
+        })
+        .catch(error => {
+            console.error('Erreur lors de la création de la conversation privée', error);
+        });
+}
+
 
 
 

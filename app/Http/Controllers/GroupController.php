@@ -68,6 +68,25 @@ class GroupController extends Controller
         return view('chatRoom', ['users' => $users, 'groups' => $groups]);
     }
 
+    public function checkPrivateGroup($userOneId, $userTwoId)
+    {
+        // Trouver un groupe où seulement ces deux utilisateurs sont présents et qui suit le modèle de nommage spécifique pour les conversations privées.
+        $groupName = "Private_{$userOneId}_{$userTwoId}";
+        $group = Group::where('name', $groupName)->withCount('users')
+            ->having('users_count', '=', 2)
+            ->first();
+
+        if ($group) {
+            // Un groupe avec exactement ces deux utilisateurs et le nom spécifique a été trouvé
+            return response()->json(['groupId' => $group->id, 'groupName' => $group->name]);
+        } else {
+            // Aucun groupe trouvé avec exactement ces deux utilisateurs et le nom spécifique
+            return response()->json(['groupId' => null]);
+        }
+    }
+
+
+
 }
 
 

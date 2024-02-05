@@ -12,33 +12,43 @@ class GroupController extends Controller
 
     public function store(Request $request)
     {
-        // Valider la requête
         $request->validate([
             'groupName' => 'required|string|max:255',
             'userIds' => 'required|array',
-            'userIds.*' => 'exists:users,id' // Assure-toi que les IDs d'utilisateurs existent
+            'userIds.*' => 'exists:users,id'
         ]);
 
-        // Créer un nouveau groupe
         $group = new Group();
         $group->name = $request->input('groupName');
+        // Définir le type en fonction du nombre d'utilisateurs (par exemple, 'private' pour 2 utilisateurs)
+        $group->type = count($request->input('userIds')) === 2 ? 'private' : 'group';
         $group->save();
 
-        // Associer les utilisateurs sélectionnés au groupe
         $group->users()->sync($request->input('userIds'));
 
-        // Retourner une réponse, par exemple
         return response()->json(['success' => 'Groupe créé avec succès', 'group' => $group]);
     }
+
 
 
     public function getUserGroups(Request $request)
     {
         $user = $request->user();
-        $groups = $user->groups; // Assure-toi que la relation 'groups' est définie dans le modèle User
+
+        // Récupérez le type à partir de la requête, s'il est présent
+        $type = $request->query('type');
+
+        if ($type) {
+            // Filtrer les groupes en fonction du type si le paramètre type est présent
+            $groups = $user->groups()->where('type', $type)->get();
+        } else {
+            // Sinon, retourner tous les groupes de l'utilisateur
+            $groups = $user->groups;
+        }
 
         return response()->json(['groups' => $groups]);
     }
+
 
     public function getMessages(Group $group)
     {

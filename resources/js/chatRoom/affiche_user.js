@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     loadUserGroups();
+    loadUserConversation()
     getUserInfo();
 
 });
@@ -127,7 +128,7 @@ function createGroup() {
 
 
 function loadUserGroups() {
-    axios.get('/api/user-groups')
+    axios.get('/api/user-groups?type=group')
         .then(response => {
             const groups = response.data.groups;
             const groupsContainer = document.querySelector('.flex.flex-col.-mx-4'); // Sélecteur de la div où afficher les groupes
@@ -354,6 +355,7 @@ function createPrivateGroup(userOneId, userTwoId) {
             .then(response => {
                 console.log('Conversation privée créée avec succès', response.data.group);
                 joinGroupChat(response.data.group.id, groupName);
+                loadUserConversation()
             })
             .catch(error => {
                 console.error('Erreur lors de la création de la conversation privée', error);
@@ -361,6 +363,67 @@ function createPrivateGroup(userOneId, userTwoId) {
     }).catch(error => {
         console.error('Erreur lors de la récupération des informations de l\'utilisateur', error);
     });
+}
+
+
+function loadUserConversation() {
+    axios.get('/api/user-groups?type=private')
+        .then(response => {
+            const groups = response.data.groups;
+            const conversationsContainer = document.querySelector('.flex.flex-col.divide-y.h-full.overflow-y-auto.-mx-4'); // Sélecteur de la div pour les conversations
+
+            // Nettoie la liste actuelle des conversations
+            conversationsContainer.innerHTML = '';
+
+            groups.forEach(group => {
+                // Crée un nouvel élément pour chaque conversation
+                const conversationElement = document.createElement('div');
+                conversationElement.classList.add('flex', 'flex-row', 'items-center', 'p-4', 'relative');
+
+                // Temps depuis la dernière activité (exemple statique '2 hours ago')
+                const timeElement = document.createElement('div');
+                timeElement.classList.add('absolute', 'text-xs', 'text-gray-500', 'right-0', 'top-0', 'mr-4', 'mt-3');
+                timeElement.textContent = '2 hours ago'; // Remplacer par une valeur dynamique si disponible
+
+                // Icône (exemple statique avec 'T')
+                const iconElement = document.createElement('div');
+                iconElement.classList.add('flex', 'items-center', 'justify-center', 'h-10', 'w-10', 'rounded-full', 'bg-pink-500', 'text-pink-300', 'font-bold', 'flex-shrink-0');
+                iconElement.textContent = group.name.charAt(0); // Utilisez la première lettre du nom du groupe comme icône
+
+                // Nom et dernier message
+                const groupInfoElement = document.createElement('div');
+                groupInfoElement.classList.add('flex', 'flex-col', 'flex-grow', 'ml-3');
+                const groupNameElement = document.createElement('div');
+                groupNameElement.classList.add('text-sm', 'font-medium');
+                groupNameElement.textContent = group.name; // Nom du groupe
+                const lastMessageElement = document.createElement('div');
+                lastMessageElement.classList.add('text-xs', 'truncate', 'w-40');
+                lastMessageElement.textContent = 'Good after noon! how can i help you?'; // Dernier message, remplacer par la donnée dynamique si disponible
+
+                // Nombre de nouveaux messages (exemple statique '3')
+                const newMessagesElement = document.createElement('div');
+                newMessagesElement.classList.add('flex-shrink-0', 'ml-2', 'self-end', 'mb-1');
+                const messagesCountElement = document.createElement('span');
+                messagesCountElement.classList.add('flex', 'items-center', 'justify-center', 'h-5', 'w-5', 'bg-red-500', 'text-white', 'text-xs', 'rounded-full');
+                messagesCountElement.textContent = '3'; // Remplacer par le nombre réel de nouveaux messages si disponible
+
+                // Assemblage des éléments
+                groupInfoElement.appendChild(groupNameElement);
+                groupInfoElement.appendChild(lastMessageElement);
+                newMessagesElement.appendChild(messagesCountElement);
+                conversationElement.appendChild(timeElement);
+                conversationElement.appendChild(iconElement);
+                conversationElement.appendChild(groupInfoElement);
+                conversationElement.appendChild(newMessagesElement);
+
+                // Ajouter un écouteur d'événements pour rejoindre la conversation lors du clic
+                conversationElement.addEventListener('click', () => joinGroupChat(group.id, groupNameElement.textContent));
+
+                // Ajouter l'élément de conversation au conteneur
+                conversationsContainer.appendChild(conversationElement);
+            });
+        })
+        .catch(error => console.error('Erreur lors du chargement des groupes', error));
 }
 
 

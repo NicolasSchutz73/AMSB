@@ -21,6 +21,13 @@ document.addEventListener('DOMContentLoaded', function() {
         messageInput.value = ''; // Efface le champ après l'envoi
     });
 
+    messageInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            sendMessage(messageInput.value); // Simule un clic sur le bouton d'envoi
+            messageInput.value = ''; // Efface le champ après l'envoi
+        }
+    });
+
 
     getUserInfoAsync().then(() => {
         loadUserGroups();

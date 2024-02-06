@@ -359,6 +359,11 @@ function appendMessageToChat(messageContent, authorID, authorFirstname, authorLa
     messageElement.appendChild(flexDiv);
 
     chatDiv.appendChild(messageElement);
+
+    const lastMessageElement = chatDiv.lastElementChild;
+    if (lastMessageElement) {
+        lastMessageElement.scrollIntoView({  block: 'end' });
+    }
 }
 
 

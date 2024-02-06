@@ -59,7 +59,7 @@ function handleUserSelection(event, userId) {
 }
 
 function loadUserGroups() {
-    axios.get('/api/user-groups')
+    axios.get('/user-groups')
         .then(response => {
             const groups = response.data.groups;
             const groupList = document.getElementById('groupList');
@@ -181,14 +181,21 @@ function createGroup() {
         return;
     }
 
-    axios.post('/create-group', { groupName, userIds: selectedUsers })
+    // Récupère les IDs des utilisateurs sélectionnés
+    const selectedUserIds = Array.from(document.querySelectorAll('#userList input[type="checkbox"]:checked')).map(cb => cb.value);
+
+    axios.post('/create-group', {
+        groupName: groupName,
+        userIds: selectedUserIds
+    })
         .then(() => {
             console.log('Groupe créé avec succès');
-            document.getElementById('groupName').value = '';
-            selectedUsers = [];
-            document.querySelectorAll('#userList input[type="checkbox"]').forEach(checkbox => checkbox.checked = false);
+            loadUserGroups(); // Appelle cette fonction pour recharger et afficher les groupes
         })
         .catch(error => {
             console.error('Erreur lors de la création du groupe', error);
         });
 }
+
+// Assurez-vous que cette fonction est bien appelée lors du clic sur le bouton de création de groupe
+document.getElementById('createGroupButton').addEventListener('click', createGroup);

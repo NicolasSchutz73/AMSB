@@ -14,18 +14,16 @@ class ChatMessageEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $nickname;
+    public $groupId; // Ajout d'une propriété pour stocker l'ID du groupe
     public $message;
-
 
     /**
      * Create a new event instance.
      */
-    public function __construct(string $nickname, string $message)
+    public function __construct(string $groupId, string $message)
     {
-        $this ->nickname = $nickname;
-        $this ->message = $message;
-
+        $this->groupId = $groupId; // Stocke l'ID du groupe
+        $this->message = $message;
     }
 
     /**
@@ -35,12 +33,12 @@ class ChatMessageEvent implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-        return [
-            new Channel('chat'),
-        ];
+        // Utilise un canal privé pour chaque groupe en utilisant l'ID du groupe
+        return [new PrivateChannel('group.' . $this->groupId)];
     }
 
-    public function broadcastAs(){
+    public function broadcastAs()
+    {
         return 'chat-message';
     }
 }

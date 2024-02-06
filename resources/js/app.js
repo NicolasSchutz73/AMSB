@@ -32,16 +32,16 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     if (calendarEl == null) return;
 
-    const { data } = await axios.get('/api/events');
+    const {data} = await axios.get('/api/events');
 
     // Initialiser FullCalendar
     const calendar = new Calendar(calendarEl, {
-        plugins: [ timeGridPlugin ],
+        plugins: [timeGridPlugin],
         initialView: 'timeGridWeek',
         slotMinTime: "08:00:00",
         slotMaxTime: "23:00:00",
-        eventClick: async function(info) {
-            let { data } = await axios.put('/api/subscribe', {
+        eventClick: async function (info) {
+            let {data} = await axios.put('/api/subscribe', {
                 id: info.event.id,
             });
 
@@ -53,42 +53,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     calendar.setOption('locale', 'fr');
     calendar.render();
 
-    // ----------- //
-    // ChatGlobal  //
-    // ----------- //
-
-    const messageInput = document.getElementById("message");
-    const chatDiv = document.getElementById('chat');
-    const submitButton = document.getElementById('submitButton');
-
-    submitButton.addEventListener('click', () => {
-        // Construction du nickname à partir des données de l'utilisateur
-        const nickname = window.User ? `${window.User.firstname} ${window.User.lastname}` : 'Utilisateur inconnu';
-
-        axios.post('/chat', {
-            nickname: nickname,
-            message: messageInput.value
-        }).then(response => {
-            console.log(response);
-            messageInput.value = '';
-        }).catch(error => {
-            console.error(error);
-        });
-    });
-
-    window.Echo.channel('chat').listen('.chat-message', (event)=>{
-        console.log(event)
-
-        chatDiv.innerHTML += `
-
-       <div class="other break-all mt-2  ml-5 rounded-bl-none float-none bg-gray-300 mr-auto rounded-2xl p-2">
-            <p>${event.message} par  <em>${event.nickname}</em></p>
-       </div>
-
-    `
-    })
-
-});
+})
 // <<------------>> //
 
 

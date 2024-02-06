@@ -20,5 +20,8 @@ class Group extends Model
         return $this->hasMany(Message::class);
     }
 
+
+    protected $fillable = ['name', 'type'];
+
 }
 

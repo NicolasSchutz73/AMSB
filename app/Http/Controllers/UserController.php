@@ -71,6 +71,7 @@ class UserController extends Controller
      */
     public function show(User $user): View
     {
+
         return view('users.show', [
             'user' => $user
         ]);
@@ -138,6 +139,19 @@ class UserController extends Controller
         return redirect()->route('users.index');
     }
 
+    /**
+     * Récupère les détails d'un utilisateur par son ID et retourne les données en JSON.
+     *
+     * @param int $id L'ID de l'utilisateur.
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getUserDetailsById($id)
+    {
+        $user = User::findOrFail($id);
+
+        return response()->json($user);
+    }
+
 
     public function chatRoomUsers()
     {
@@ -151,6 +165,21 @@ class UserController extends Controller
         $users = User::all(); // Ou toute autre logique pour obtenir les utilisateurs
         return response()->json($users);
     }
+
+    // Dans votre controller
+    public function getUserInfo()
+    {
+        // Récupération de l'utilisateur actuellement connecté
+        $user = auth()->user();
+
+        // Retourne le prénom et le nom sous forme de tableau associatif
+        return response()->json([
+            'firstname' => $user->firstname,
+            'lastname' => $user->lastname,
+            'id' => $user->id,
+        ]);
+    }
+
 
 
 

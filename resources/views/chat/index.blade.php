@@ -1,5 +1,5 @@
 
-
+<x-app-layout>
 <!doctype html>
 <html lang="fr">
 <head>
@@ -133,3 +133,6 @@
 
 </body>
 </html>
+
+</x-app-layout>
+

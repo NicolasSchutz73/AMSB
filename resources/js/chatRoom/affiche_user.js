@@ -21,13 +21,37 @@ document.addEventListener('DOMContentLoaded', function() {
         messageInput.value = ''; // Efface le champ après l'envoi
     });
 
-    loadUserGroups();
-    loadUserConversation()
-    getUserInfo();
+    messageInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            sendMessage(messageInput.value); // Simule un clic sur le bouton d'envoi
+            messageInput.value = ''; // Efface le champ après l'envoi
+        }
+    });
+
+
+    getUserInfoAsync().then(() => {
+        loadUserGroups();
+        loadUserConversation();
+    }).catch(error => {
+        console.error('Erreur lors de la récupération des informations utilisateur', error);
+    });
+
 
 });
 
 let isGroupCreationActive = false;
+
+function getUserInfoAsync() {
+    return new Promise((resolve, reject) => {
+        try {
+            getUserInfo(); // votre fonction actuelle qui ne retourne pas de promesse
+            resolve(); // Si tout va bien, résolvez la promesse
+        } catch (error) {
+            reject(error); // Si une erreur se produit, rejetez la promesse
+        }
+    });
+}
+
 
 
 
@@ -196,8 +220,13 @@ function loadPreviousMessages(groupId) {
 
             messages.forEach(message => {
                 // Vérifiez que vous avez bien les propriétés user_firstname et user_lastname dans chaque message
-                appendMessageToChat(message.content, message.user_firstname, message.user_lastname);
+                appendMessageToChat(message.content, message.user_id, message.user_firstname, message.user_lastname);
+                console.log(message.content, message.user_id, message.user_firstname, message.user_lastname)
             });
+            const lastMessageElement = chatDiv.lastElementChild;
+            if (lastMessageElement) {
+                lastMessageElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
         })
         .catch(error => console.error('Erreur lors du chargement des messages', error));
 }
@@ -232,8 +261,8 @@ function subscribeToGroupChannel(groupId) {
     if (!groupChannels[groupId]) {
         groupChannels[groupId] = window.Echo.private(`group.${groupId}`)
             .listen('GroupChatMessageEvent', (e) => {
-                console.log(e.message.content, e.message.firstname, e.message.lastname)
-                appendMessageToChat(e.message.content, e.message.firstname, e.message.lastname);
+                console.log(e.message.content,e.message.id, e.message.firstname, e.message.lastname)
+                appendMessageToChat(e.message.content,e.message.id, e.message.firstname, e.message.lastname);
             });
     }
 }
@@ -254,6 +283,7 @@ function getUserInfo() {
         });
 }
 
+
 function sendMessage() {
     const messageInput = document.querySelector('input[type="text"]');
     const messageContent = messageInput.value;
@@ -268,8 +298,9 @@ function sendMessage() {
         message: messageContent
     })
         .then(() => {
-            //appendMessageToChat(messageContent, globalFirstname, globalLastname);
+            //appendMessageToChat(messageContent, globalUserId, globalFirstname, globalLastname);
             messageInput.value = '';
+            loadPreviousMessages(currentGroupId)
         })
         .catch(error => {
             console.error('Erreur d\'envoi', error);
@@ -282,34 +313,48 @@ function sendMessage() {
 // Liez cette fonction au bouton d'envoi ou à l'événement 'submit' du formulaire de message.
 
 
-
-function appendMessageToChat(messageContent, authorFirstname, authorLastname) {
+function appendMessageToChat(messageContent, authorID, authorFirstname, authorLastname) {
     const chatDiv = document.querySelector('.grid.grid-cols-12.gap-y-2');
     const messageElement = document.createElement('div');
-    messageElement.classList.add('col-start-1', 'col-end-8', 'p-3', 'rounded-lg');
 
-    // Vérifie si authorFirstname et authorLastname sont définis
-    const authorInfoText = authorFirstname && authorLastname ? `${authorFirstname} ${authorLastname}` : 'Utilisateur inconnu';
+    // Déterminez si le message a été envoyé par l'utilisateur actuel
+    const isCurrentUserMessage = authorID === globalUserId;
+
+    // Appliquez des classes conditionnelles pour aligner les messages à droite ou à gauche
+    if (isCurrentUserMessage) {
+        messageElement.classList.add('col-start-6', 'col-end-13', 'p-3', 'rounded-lg', 'self-end', 'text-right');
+    } else {
+        messageElement.classList.add('col-start-1', 'col-end-8', 'p-3', 'rounded-lg', 'self-start', 'text-left');
+    }
 
     const authorInfoDiv = document.createElement('div');
     authorInfoDiv.classList.add('mb-2', 'text', 'italic', 'text-gray-600', 'text-xs');
-    authorInfoDiv.textContent = authorInfoText;
+    authorInfoDiv.textContent = isCurrentUserMessage ? 'Vous' : `${authorFirstname} ${authorLastname}`;
 
     const flexDiv = document.createElement('div');
-    flexDiv.classList.add('flex', 'flex-row', 'items-center');
+    // Appliquez 'justify-end' pour aligner à droite si c'est l'utilisateur actuel
+    flexDiv.classList.add('flex', 'items-center', isCurrentUserMessage ? 'justify-end' : 'justify-start');
 
-    // Utilisez les initiales de authorFirstname et authorLastname ou utilisez une valeur par défaut si non disponibles
     const initials = `${authorFirstname ? authorFirstname.charAt(0) : ''}${authorLastname ? authorLastname.charAt(0) : ''}`;
     const authorDiv = document.createElement('div');
-    authorDiv.classList.add('flex', 'items-center', 'justify-center', 'h-10', 'w-10', 'rounded-full', 'bg-indigo-500', 'flex-shrink-0', 'text-white', 'font-bold');
-    authorDiv.textContent = initials.toUpperCase() || 'U'; // 'U' pour 'Utilisateur'
+    authorDiv.classList.add('flex', 'items-center', 'justify-center', 'h-10', 'w-10', 'rounded-full', 'text-white', 'font-bold');
+    authorDiv.style.backgroundColor = isCurrentUserMessage ? '#4F46E5' : '#CBD5E1';
+
+    authorDiv.textContent = initials.toUpperCase() || 'U';
 
     const messageContentDiv = document.createElement('div');
-    messageContentDiv.classList.add('relative', 'ml-3', 'text-sm', 'bg-white', 'py-2', 'px-4', 'shadow', 'rounded-xl');
+    messageContentDiv.classList.add('relative', 'text-sm', 'bg-white', 'py-2', 'px-4', 'shadow', 'rounded-xl');
     messageContentDiv.textContent = messageContent;
 
-    flexDiv.appendChild(authorDiv);
-    flexDiv.appendChild(messageContentDiv);
+    // Inversez l'ordre d'ajout pour les messages de l'utilisateur actuel
+    if (isCurrentUserMessage) {
+        flexDiv.appendChild(authorDiv);
+        flexDiv.appendChild(messageContentDiv);
+    } else {
+        flexDiv.appendChild(messageContentDiv);
+        flexDiv.appendChild(authorDiv);
+    }
+
     messageElement.appendChild(authorInfoDiv);
     messageElement.appendChild(flexDiv);
 
@@ -318,16 +363,15 @@ function appendMessageToChat(messageContent, authorFirstname, authorLastname) {
 
 
 
+
 function startConversation(userId) {
     axios.get(`/check-group/${globalUserId}/${userId}`)
         .then(response => {
             if (response.data.groupId) {
                 // Un groupe existant a été trouvé, rejoignez-le
-                console.log("Un groupe existe déjà avec l'ID :" + response.data.groupName)
                 joinGroupChat(response.data.groupId, response.data.groupName);
             } else {
                 // Aucun groupe n'existe, créez-en un nouveau
-                console.log("Aucun groupe trouvé, en créer un nouveau.");
                 createPrivateGroup(globalUserId, userId);
             }
         })
@@ -353,7 +397,7 @@ function createPrivateGroup(userOneId, userTwoId) {
             userIds: [userOneId, userTwoId]
         })
             .then(response => {
-                console.log('Conversation privée créée avec succès', response.data.group);
+                console.log('Conversation privée créée avec succès', response.data);
                 joinGroupChat(response.data.group.id, groupName);
                 loadUserConversation()
             })
@@ -369,6 +413,7 @@ function createPrivateGroup(userOneId, userTwoId) {
 function loadUserConversation() {
     axios.get('/api/user-groups?type=private')
         .then(response => {
+            console.log(response.data)
             const groups = response.data.groups;
             const conversationsContainer = document.querySelector('.flex.flex-col.divide-y.h-full.overflow-y-auto.-mx-4'); // Sélecteur de la div pour les conversations
 
@@ -376,6 +421,10 @@ function loadUserConversation() {
             conversationsContainer.innerHTML = '';
 
             groups.forEach(group => {
+                const otherMember = group.members.find(member => member.id !== globalUserId);
+                console.log(otherMember)
+                console.log(globalUserId)
+
                 // Crée un nouvel élément pour chaque conversation
                 const conversationElement = document.createElement('div');
                 conversationElement.classList.add('flex', 'flex-row', 'items-center', 'p-4', 'relative');
@@ -395,7 +444,7 @@ function loadUserConversation() {
                 groupInfoElement.classList.add('flex', 'flex-col', 'flex-grow', 'ml-3');
                 const groupNameElement = document.createElement('div');
                 groupNameElement.classList.add('text-sm', 'font-medium');
-                groupNameElement.textContent = group.name; // Nom du groupe
+                groupNameElement.textContent = otherMember ? `${otherMember.firstname} ${otherMember.lastname}` : 'Unknown';
                 const lastMessageElement = document.createElement('div');
                 lastMessageElement.classList.add('text-xs', 'truncate', 'w-40');
                 lastMessageElement.textContent = 'Good after noon! how can i help you?'; // Dernier message, remplacer par la donnée dynamique si disponible

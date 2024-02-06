@@ -36,3 +36,4 @@ Route::get('/check-group/{userOneId}/{userTwoId}', [GroupController::class, 'che
 
 Route::middleware('auth:sanctum')->get('/user-details/{id}', [UserController::class, 'getUserDetailsById']);
 
+

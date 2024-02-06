@@ -98,6 +98,23 @@ Route::resources([
     'chat' => ChatController::class, // Gestion de la messagerie
 ]);
 
+
+/*
+|--------------------------------------------------------------------------
+    | Routes des notifications
+|--------------------------------------------------------------------------
+|
+| Ces routes sont utilisées pour des fonctionnalités de notifications.
+|
+*/
+
+Route::get('/notification', function () {
+    return view('notification');
+})->middleware(['auth', 'verified'])->name('notification');
+
+Route::post('/save-token', [App\Http\Controllers\HomeController::class, 'saveToken'])->name('save-token');
+Route::post('/send-notification', [App\Http\Controllers\HomeController::class, 'sendNotification'])->name('send.notification');
+
 /*
 |--------------------------------------------------------------------------
 | Routes supplémentaires et API

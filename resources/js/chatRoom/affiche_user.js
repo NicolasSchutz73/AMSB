@@ -216,6 +216,10 @@ function loadPreviousMessages(groupId) {
                 appendMessageToChat(message.content, message.user_id, message.user_firstname, message.user_lastname);
                 console.log(message.content, message.user_id, message.user_firstname, message.user_lastname)
             });
+            const lastMessageElement = chatDiv.lastElementChild;
+            if (lastMessageElement) {
+                lastMessageElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
         })
         .catch(error => console.error('Erreur lors du chargement des messages', error));
 }

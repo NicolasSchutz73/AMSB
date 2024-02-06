@@ -7,7 +7,7 @@
 
 
 <!-- component -->
-<div class="flex flex-row h-screen antialiased text-gray-800">
+<div class="flex flex-row h-[92vh] antialiased text-gray-800">
     <div class="flex flex-row w-96 flex-shrink-0 bg-gray-100 p-4">
         <div class="flex flex-col w-full h-full pl-4 pr-4 py-4 -mr-4">
             <div class="flex flex-row items-center">

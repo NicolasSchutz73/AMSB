@@ -26,7 +26,11 @@ class StoreUserRequest extends FormRequest
             'lastname' => 'required|string|max:250',
             'email' => 'required|string|email:rfc,dns|max:250|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
-            'roles' => 'required'
+            'roles' => 'required',
+            'description' => 'nullable|string|max:255',
+            'emergency' => 'nullable|string|max:255',
+            'profile_photo_path' => ['nullable', 'string', 'max:255'],
+            'document_path' => 'nullable|string|max:255',
         ];
     }
 }

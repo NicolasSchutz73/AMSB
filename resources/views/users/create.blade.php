@@ -1,5 +1,3 @@
-<!-- TODO: Modifier la mise en page -->
-
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between">
@@ -13,7 +11,7 @@
     </x-slot>
 
     <div class="p-6">
-        <form action="{{ route('users.store') }}" method="post">
+        <form action="{{ route('users.store') }}" method="post" enctype="multipart/form-data">
             @csrf
 
             <div class="mb-4">
@@ -88,10 +86,31 @@
                 </div>
             </div>
 
+            <!-- Description Field -->
+            <div class="mb-4">
+                <label for="description" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 block text-md-end text-start">Description</label>
+                <div>
+                    <textarea class="w-full px-3 py-2 border rounded-lg @error('description') border-red-500 @enderror" id="description" name="description">{{ old('description') }}</textarea>
+                    @if ($errors->has('description'))
+                        <span class="text-red-500">{{ $errors->first('description') }}</span>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Emergency Contact Field -->
+            <div class="mb-4">
+                <label for="emergency" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 block text-md-end text-start">Emergency Contact</label>
+                <div>
+                    <input type="text" class="w-full px-3 py-2 border rounded-lg @error('emergency') border-red-500 @enderror" id="emergency" name="emergency" value="{{ old('emergency') }}">
+                    @if ($errors->has('emergency'))
+                        <span class="text-red-500">{{ $errors->first('emergency') }}</span>
+                    @endif
+                </div>
+            </div>
+
             <div class="mb-4">
                 <input type="submit" class="w-full px-3 py-2 bg-blue-500 text-white rounded-lg" value="Add User">
             </div>
-
         </form>
     </div>
 </x-app-layout>

@@ -160,6 +160,69 @@ class GroupController extends Controller
         ]);
     }
 
+    public function sendNotificationGroup(Request $request)
+    {
+        // Valider la requête
+        $validatedData = $request->validate([
+            'groupId' => 'required|integer',
+            'message' => 'required|string',
+        ]);
+
+        // Récupérer le groupe par son ID
+        $group = Group::find($validatedData['groupId']);
+
+        // Vérifier si le groupe existe
+        if (!$group) {
+            return response()->json(['error' => 'Group not found'], 404);
+        }
+
+        // Récupérer les tokens FCM des membres du groupe
+        $firebaseTokens = $group->users()->whereNotNull('device_token')->pluck('device_token')->all();
+
+        if (empty($firebaseTokens)) {
+            return response()->json(['error' => 'No members with registered devices in this group'], 404);
+        }
+
+        // Configuration de la clé API du serveur FCM et des données de la notification
+        $SERVER_API_KEY = 'your_fcm_server_api_key_here';
+        $data = [
+            "registration_ids" => $firebaseTokens,
+            "notification" => [
+                "title" => "New message in group {$group->name}",
+                "body" => $validatedData['message'],
+                "content_available" => true,
+                "priority" => "high",
+            ]
+        ];
+
+        // Envoyer la notification via FCM
+        $dataString = json_encode($data);
+        $headers = [
+            'Authorization: key=' . $SERVER_API_KEY,
+            'Content-Type: application/json',
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
+
+        $response = curl_exec($ch);
+
+        if ($response === false) {
+            $error = curl_error($ch);
+            curl_close($ch);
+            return response()->json(['error' => "cURL Error: " . $error], 500);
+        }
+
+        curl_close($ch);
+        return response()->json(['success' => 'Notifications sent successfully']);
+    }
+
+
 
 
 }

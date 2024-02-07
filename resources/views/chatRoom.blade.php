@@ -312,4 +312,81 @@
 
     @vite('resources/js/chatRoom/affiche_user.js')
     @vite('resources/js/bootstrap.js')
+
+    <!-- Dans votre vue Blade (par exemple, dans resources/views/welcome.blade.php) -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/firebase-messaging-sw.js')
+                .then(function(registration) {
+                    console.log('Service Worker Registered', registration);
+                })
+                .catch(function(err) {
+                    console.log('Service Worker Registration Failed', err);
+                });
+        }
+    </script>
+
+    <script src="https://www.gstatic.com/firebasejs/7.23.0/firebase.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <script>
+
+        var firebaseConfig = {
+            apiKey: "AIzaSyCxxKnWhC3mcOalpB-FCWJoA9Kg9jSCnPs",
+            authDomain: "push-notification-56ed1.firebaseapp.com",
+            projectId: "push-notification-56ed1",
+            storageBucket: "push-notification-56ed1.appspot.com",
+            messagingSenderId: "693422657082",
+            appId: "1:693422657082:web:9998341db608b8d576af03",
+            measurementId: "G-FJVMG71W9Q"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const messaging = firebase.messaging();
+
+        function initFirebaseMessagingRegistration() {
+            messaging
+                .requestPermission()
+                .then(function () {
+                    return messaging.getToken()
+                })
+                .then(function(token) {
+                    console.log(token);
+
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    });
+
+                    $.ajax({
+                        url: '{{ route("save-token") }}',
+                        type: 'POST',
+                        data: {
+                            token: token
+                        },
+                        dataType: 'JSON',
+                        success: function (response) {
+                            alert('Token saved successfully.');
+                        },
+                        error: function (err) {
+                            console.log('User Chat Token Error'+ err);
+                        },
+                    });
+
+                }).catch(function (err) {
+                console.log('User Chat Token Error'+ err);
+            });
+        }
+
+        messaging.onMessage(function(payload) {
+            const noteTitle = payload.notification.title;
+            const noteOptions = {
+                body: payload.notification.body,
+                icon: payload.notification.icon,
+            };
+            new Notification(noteTitle, noteOptions);
+        });
+
+    </script>
+
 </x-app-layout>

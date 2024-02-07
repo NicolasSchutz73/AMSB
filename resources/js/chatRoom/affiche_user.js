@@ -301,6 +301,8 @@ function sendMessage() {
             //appendMessageToChat(messageContent, globalUserId, globalFirstname, globalLastname);
             messageInput.value = '';
             loadPreviousMessages(currentGroupId)
+            triggerPushNotification(currentGroupId, messageContent)
+
         })
         .catch(error => {
             console.error('Erreur d\'envoi', error);
@@ -480,6 +482,34 @@ function loadUserConversation() {
         .catch(error => console.error('Erreur lors du chargement des groupes', error));
 }
 
+// Dans votre script JS inclus dans une vue Blade
+function sendNotificationToSW(title, body, icon) {
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+            type: 'SHOW_NOTIFICATION',
+            title: title,
+            body: body,
+            icon: icon
+        });
+    } else {
+        console.log('Service Worker not registered or page not controlled by SW');
+    }
+}
+
+function triggerPushNotification(groupId, messageContent) {
+    axios.post('/api/send-notification-group', {
+        groupId: groupId,
+        message: messageContent
+    })
+        .then(response => {
+            console.log('Notification triggered successfully');
+        })
+        .catch(error => {
+            console.error('Error triggering notification', error);
+        });
+}
+
+
 
 
 
@@ -496,3 +526,8 @@ function openModal() {
 function closeModal() {
     document.getElementById('userModal').classList.add('hidden');
 }
+
+
+
+
+

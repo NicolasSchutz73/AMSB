@@ -180,7 +180,7 @@ class GroupController extends Controller
         // Récupérer les tokens FCM des membres du groupe
         $firebaseTokens = $group->users()
             ->whereNotNull('device_token')
-            ->where('id', '!=', $validatedData['id_sender']) // Exclure l'expéditeur
+            ->where('users.id', '!=', $validatedData['id_sender']) // Exclure l'expéditeur
             ->pluck('device_token')
             ->all();
         if (empty($firebaseTokens)) {

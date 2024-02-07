@@ -301,7 +301,7 @@ function sendMessage() {
             //appendMessageToChat(messageContent, globalUserId, globalFirstname, globalLastname);
             messageInput.value = '';
             loadPreviousMessages(currentGroupId)
-            triggerPushNotification(currentGroupId, messageContent)
+            triggerPushNotification(currentGroupId, messageContent, globalUserId)
 
         })
         .catch(error => {
@@ -496,10 +496,12 @@ function sendNotificationToSW(title, body, icon) {
     }
 }
 
-function triggerPushNotification(groupId, messageContent) {
+function triggerPushNotification(groupId, messageContent, globaluserId) {
     axios.post('/api/send-notification-group', {
         groupId: groupId,
-        message: messageContent
+        message: messageContent,
+        id_sender : globaluserId
+
     })
         .then(response => {
             console.log('Notification triggered successfully');

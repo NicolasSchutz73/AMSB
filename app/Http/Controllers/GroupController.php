@@ -166,6 +166,7 @@ class GroupController extends Controller
         $validatedData = $request->validate([
             'groupId' => 'required|integer',
             'message' => 'required|string',
+            'id_sender' =>'required|integer'
         ]);
 
         // Récupérer le groupe par son ID
@@ -177,14 +178,17 @@ class GroupController extends Controller
         }
 
         // Récupérer les tokens FCM des membres du groupe
-        $firebaseTokens = $group->users()->whereNotNull('device_token')->pluck('device_token')->all();
-
+        $firebaseTokens = $group->users()
+            ->whereNotNull('device_token')
+            ->where('id', '!=', $validatedData['id_sender']) // Exclure l'expéditeur
+            ->pluck('device_token')
+            ->all();
         if (empty($firebaseTokens)) {
             return response()->json(['error' => 'No members with registered devices in this group'], 404);
         }
 
         // Configuration de la clé API du serveur FCM et des données de la notification
-        $SERVER_API_KEY = 'AIzaSyCxxKnWhC3mcOalpB-FCWJoA9Kg9jSCnPs';
+        $SERVER_API_KEY = 'AAAAoXM2Djo:APA91bG4FIc9ClN16o2rpZ6jByJPYXqXwlpBW_GeRcgiomMslDKkgG8MszzC8eI36-KKb9iQFzL567Bk29xA2ZfadgNTg5c8EPeKxF4E8dcOyLyYtND_3Hvl4Y8seQDrcocnmpzBZxml';
         $data = [
             "registration_ids" => $firebaseTokens,
             "notification" => [

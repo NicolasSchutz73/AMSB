@@ -12,6 +12,7 @@
 
         <div class="flex flex-col w-full h-full pl-4 pr-4 py-4 -mr-4">
             <div class="flex items-center justify-center p-5">
+
                 <label for="toggleNotifications" class="flex items-center cursor-pointer">
                     <!-- toggle -->
                     <div class="relative">
@@ -364,6 +365,7 @@
                 if (this.checked) {
                     console.log("Notifications activées");
                     initFirebaseMessagingRegistration()
+
                     toggleDot.style.transform = 'translateX(100%)';
                     toggleDot.style.backgroundColor = '#48bb78'; // green-500 in Tailwind
                 } else {
@@ -395,44 +397,99 @@
             measurementId: "G-FJVMG71W9Q"
         };
 
+
         firebase.initializeApp(firebaseConfig);
         const messaging = firebase.messaging();
 
         function initFirebaseMessagingRegistration() {
-            messaging
-                .requestPermission()
-                .then(function () {
-                    return messaging.getToken()
-                })
-                .then(function(token) {
-                    console.log(token);
+            // Ajoutez un vérificateur pour Safari
+            if (['Safari', 'iOS'].includes(navigator.vendor)) {
+                // Pour Safari, assurez-vous que la demande de permission est faite en réponse à l'interaction de l'utilisateur
+                document.getElementById('btn-nft-enable').addEventListener('click', function () {
+                    requestPermissionForSafari();
+                });
+            } else {
+                messaging
+                    .requestPermission()
+                    .then(function () {
+                        return messaging.getToken()
+                    })
+                    .then(function (token) {
+                        console.log(token);
 
-                    $.ajaxSetup({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        }
+                        $.ajaxSetup({
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                        });
+
+                        $.ajax({
+                            url: '{{ route("save-token") }}',
+                            type: 'POST',
+                            data: {
+                                token: token
+                            },
+                            dataType: 'JSON',
+                            success: function (response) {
+                                alert('Token saved successfully.');
+                            },
+                            error: function (err) {
+                                console.log('User Chat Token Error' + err);
+                            },
+                        });
+
+                    }).catch(function (err) {
+                    console.log('User Chat Token Error' + err);
+                });
+            }
+        }
+
+
+
+
+        function requestPermissionForSafari() {
+            Notification.requestPermission().then((permission) => {
+                if (permission === 'granted') {
+                    console.log('Notification permission granted.');
+
+                    // Pour Safari, procédez à l'obtention du jeton FCM ici
+                    messaging.getToken().then(function(token) {
+                        console.log(token);
+
+                        // Enregistrez le jeton, similaire à la manière dont vous le faites pour les autres navigateurs
+                        $.ajaxSetup({
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                        });
+
+                        $.ajax({
+                            url: '{{ route("save-token") }}', // Assurez-vous que cette URL est correcte dans le contexte de Safari
+                            type: 'POST',
+                            data: {
+                                token: token
+                            },
+                            dataType: 'JSON',
+                            success: function (response) {
+                                alert('Token saved successfully.');
+
+                            },
+                            error: function (err) {
+                                console.log('User Chat Token Error' + err);
+                            },
+                        });
+
+                    }).catch(function(err) {
+                        console.log('Error getting token for Safari: ' + err);
                     });
-
-                    $.ajax({
-                        url: '{{ route("save-token") }}',
-                        type: 'POST',
-                        data: {
-                            token: token
-                        },
-                        dataType: 'JSON',
-                        success: function (response) {
-                            alert('Token saved successfully.');
-                        },
-                        error: function (err) {
-                            console.log('User Chat Token Error'+ err);
-                        },
-                    });
-
-                }).catch(function (err) {
-                console.log('User Chat Token Error'+ err);
+                } else {
+                    console.log('Unable to get permission to notify.');
+                }
             });
         }
 
+
+        // Gestion des messages entrants
         messaging.onMessage(function(payload) {
             const noteTitle = payload.notification.title;
             const noteOptions = {
@@ -441,7 +498,6 @@
             };
             new Notification(noteTitle, noteOptions);
         });
-
     </script>
 
 </x-app-layout>

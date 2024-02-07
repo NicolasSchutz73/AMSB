@@ -37,11 +37,11 @@
                     </div>
                 @endcanany
 
-               {{-- <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('notification')" :active="request()->routeIs('notification')">
                         {{ __('Notification') }}
                     </x-nav-link>
-                </div>--}}
+                </div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('chat-room-users')" :active="request()->routeIs('chat-room-users')">

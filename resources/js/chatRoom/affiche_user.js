@@ -503,6 +503,7 @@ function triggerPushNotification(groupId, messageContent) {
     })
         .then(response => {
             console.log('Notification triggered successfully');
+            console.log(response.data)
         })
         .catch(error => {
             console.error('Error triggering notification', error);

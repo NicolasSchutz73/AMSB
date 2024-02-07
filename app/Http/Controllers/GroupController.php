@@ -184,7 +184,7 @@ class GroupController extends Controller
         }
 
         // Configuration de la clé API du serveur FCM et des données de la notification
-        $SERVER_API_KEY = 'your_fcm_server_api_key_here';
+        $SERVER_API_KEY = 'AIzaSyCxxKnWhC3mcOalpB-FCWJoA9Kg9jSCnPs';
         $data = [
             "registration_ids" => $firebaseTokens,
             "notification" => [
@@ -219,7 +219,10 @@ class GroupController extends Controller
         }
 
         curl_close($ch);
-        return response()->json(['success' => 'Notifications sent successfully']);
+        return response()->json([
+            'success' => 'Notifications sent successfully',
+            'message' => $data
+            ]);
     }
 
 

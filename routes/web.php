@@ -1,15 +1,12 @@
 <?php
 
-use App\Http\Controllers\{
-    ChatController,
-    ProfileController,
-    HomeController,
-    GroupController,
-    ConversationController,
-    RoleController,
-    UserController
-};
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\GroupController;
+use App\Http\Controllers\ConversationController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Storage;
 
 /*
 |--------------------------------------------------------------------------
@@ -139,5 +136,18 @@ Route::get('/usersjson', [UserController::class, 'apiIndex']); // À déplacer d
 | Inclusion des routes d'authentification fournies par Laravel Breeze.
 |
 */
+
+Route::get('storage/profile-photos/{filename}', function ($filename) {
+    $path = '/ASMB/' . $filename;
+
+    if (Storage::disk('ftp')->exists($path)) {
+        $fileContent = Storage::disk('ftp')->get($path);
+        $mimeType = Storage::disk('ftp')->mimeType($path);
+
+        return response($fileContent)->header('Content-Type', $mimeType);
+    }
+
+    abort(404);
+})->where('filename', '.*');
 
 require __DIR__.'/auth.php';

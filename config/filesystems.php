@@ -30,6 +30,19 @@ return [
 
     'disks' => [
 
+        'ftp' => [
+            'driver'   => 'ftp',
+            'host'     => 'mcida.fr',
+            'username' => 'u776818696.mcida.eu',
+            'password' => '29062003$Kykygrd',
+            'root'     => '/public_html/AMSB',
+            'port'     => 21,
+            'passive'  => true,
+            'ssl'      => false,
+            'timeout'  => 30,
+            'binary'   => true,
+        ],
+
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app'),
@@ -41,7 +54,6 @@ return [
             'root' => storage_path('app/public'),
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
-            'throw' => false,
         ],
 
         's3' => [

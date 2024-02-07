@@ -23,5 +23,16 @@ class SuperAdminSeeder extends Seeder
         ]);
 
         $superAdmin->assignRole('Super Admin');
+
+        $superAdminTwo = User::create([
+            'firstname' => 'Kylian',
+            'lastname' => 'GRANDY',
+            'email' => 'kylian.grandy@gmail.com',
+            'description' => 'c\'est la description de kylian',
+            'emergency' => '0782824600',
+            'password' => Hash::make('29062003$Kykygrd')
+        ]);
+
+        $superAdminTwo->assignRole('Super Admin');
     }
 }

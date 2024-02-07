@@ -140,6 +140,8 @@ function createGroup() {
     })
         .then(() => {
             console.log('Groupe créé avec succès');
+            loadUserGroups()
+
         })
         .catch(error => {
             console.error('Erreur lors de la création du groupe', error);
@@ -147,7 +149,6 @@ function createGroup() {
     // Fermer la modale et réinitialiser l'état après la création du groupe
     closeModal();
     toggleGroupCreationMode();
-    loadUserGroups()
 }
 
 
@@ -288,6 +289,9 @@ function sendMessage() {
     const messageInput = document.querySelector('input[type="text"]');
     const messageContent = messageInput.value;
 
+    const fileInput = document.getElementById('fileInput');
+    const previewContainer = document.getElementById('previewContainer');
+
     if (!messageContent.trim() || !currentGroupId) {
         console.error('Message content is empty or no group selected');
         return;
@@ -301,6 +305,10 @@ function sendMessage() {
             //appendMessageToChat(messageContent, globalUserId, globalFirstname, globalLastname);
             messageInput.value = '';
             loadPreviousMessages(currentGroupId)
+            triggerPushNotification(currentGroupId, messageContent, globalUserId)
+            previewContainer.innerHTML = ''; // Effacer l'aperçu
+            fileInput.value = ''; // Réinitialiser l'input de fichier
+
         })
         .catch(error => {
             console.error('Erreur d\'envoi', error);
@@ -359,6 +367,11 @@ function appendMessageToChat(messageContent, authorID, authorFirstname, authorLa
     messageElement.appendChild(flexDiv);
 
     chatDiv.appendChild(messageElement);
+
+    const lastMessageElement = chatDiv.lastElementChild;
+    if (lastMessageElement) {
+        lastMessageElement.scrollIntoView({  block: 'end' });
+    }
 }
 
 
@@ -432,7 +445,7 @@ function loadUserConversation() {
                 // Temps depuis la dernière activité (exemple statique '2 hours ago')
                 const timeElement = document.createElement('div');
                 timeElement.classList.add('absolute', 'text-xs', 'text-gray-500', 'right-0', 'top-0', 'mr-4', 'mt-3');
-                timeElement.textContent = '2 hours ago'; // Remplacer par une valeur dynamique si disponible
+                //timeElement.textContent = '2 hours ago'; // Remplacer par une valeur dynamique si disponible
 
                 // Icône (exemple statique avec 'T')
                 const iconElement = document.createElement('div');
@@ -447,7 +460,7 @@ function loadUserConversation() {
                 groupNameElement.textContent = otherMember ? `${otherMember.firstname} ${otherMember.lastname}` : 'Unknown';
                 const lastMessageElement = document.createElement('div');
                 lastMessageElement.classList.add('text-xs', 'truncate', 'w-40');
-                lastMessageElement.textContent = 'Good after noon! how can i help you?'; // Dernier message, remplacer par la donnée dynamique si disponible
+                //lastMessageElement.textContent = 'Good after noon! how can i help you?'; // Dernier message, remplacer par la donnée dynamique si disponible
 
                 // Nombre de nouveaux messages (exemple statique '3')
                 const newMessagesElement = document.createElement('div');
@@ -459,7 +472,7 @@ function loadUserConversation() {
                 // Assemblage des éléments
                 groupInfoElement.appendChild(groupNameElement);
                 groupInfoElement.appendChild(lastMessageElement);
-                newMessagesElement.appendChild(messagesCountElement);
+                //newMessagesElement.appendChild(messagesCountElement);
                 conversationElement.appendChild(timeElement);
                 conversationElement.appendChild(iconElement);
                 conversationElement.appendChild(groupInfoElement);
@@ -474,6 +487,37 @@ function loadUserConversation() {
         })
         .catch(error => console.error('Erreur lors du chargement des groupes', error));
 }
+
+// Dans votre script JS inclus dans une vue Blade
+function sendNotificationToSW(title, body, icon) {
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+            type: 'SHOW_NOTIFICATION',
+            title: title,
+            body: body,
+            icon: icon
+        });
+    } else {
+        console.log('Service Worker not registered or page not controlled by SW');
+    }
+}
+
+function triggerPushNotification(groupId, messageContent, globaluserId) {
+    axios.post('/api/send-notification-group', {
+        groupId: groupId,
+        message: messageContent,
+        id_sender : globaluserId
+
+    })
+        .then(response => {
+            console.log('Notification triggered successfully');
+            console.log(response.data)
+        })
+        .catch(error => {
+            console.error('Error triggering notification', error);
+        });
+}
+
 
 
 
@@ -491,3 +535,8 @@ function openModal() {
 function closeModal() {
     document.getElementById('userModal').classList.add('hidden');
 }
+
+
+
+
+

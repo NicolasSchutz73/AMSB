@@ -8,6 +8,7 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <center>
+
                     <button id="btn-nft-enable" onclick="initFirebaseMessagingRegistration()" class="btn btn-danger btn-xs btn-flat">Allow for Notification</button>
                 </center>
                 <div class="card">
@@ -36,12 +37,26 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
+
+
 
     <script src="https://www.gstatic.com/firebasejs/7.23.0/firebase.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
     <script>
+
+        function requestPermission () {
+            console. log ('Requesting permission...');
+            Notification. requestPermission() then ((permission) => {
+                if (permission === 'granted') {
+                    console. log( 'Notification permission granted.');
+// TODO: Retrieve a registration token for use with FCM.
+                    resetUI();
+                } else {
+                    console. log ( 'Unable to get permission to notify.');
+                    Google
 
         var firebaseConfig = {
             apiKey: "AIzaSyCxxKnWhC3mcOalpB-FCWJoA9Kg9jSCnPs",

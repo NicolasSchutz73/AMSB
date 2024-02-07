@@ -40,7 +40,7 @@
                 </thead>
                 <tbody>
                 @forelse($users as $user)
-                    <tr class="bg-white border-b hover:bg-gray-50">
+                    <tr class="bg-white border-b hover:bg-gray-50 user-item">
                         <td class="px-6 py-4 text-gray-500">{{ $loop->iteration }}</td>
                         <td class="px-6 py-4 text-gray-500">{{ $user->firstname }}</td>
                         <td class="px-6 py-4 text-gray-500">{{ $user->lastname }}</td>

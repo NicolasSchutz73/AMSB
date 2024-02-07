@@ -288,6 +288,9 @@ function sendMessage() {
     const messageInput = document.querySelector('input[type="text"]');
     const messageContent = messageInput.value;
 
+    const fileInput = document.getElementById('fileInput');
+    const previewContainer = document.getElementById('previewContainer');
+
     if (!messageContent.trim() || !currentGroupId) {
         console.error('Message content is empty or no group selected');
         return;
@@ -302,6 +305,8 @@ function sendMessage() {
             messageInput.value = '';
             loadPreviousMessages(currentGroupId)
             triggerPushNotification(currentGroupId, messageContent, globalUserId)
+            previewContainer.innerHTML = ''; // Effacer l'aperçu
+            fileInput.value = ''; // Réinitialiser l'input de fichier
 
         })
         .catch(error => {

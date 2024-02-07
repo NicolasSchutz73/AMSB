@@ -197,37 +197,16 @@
                 </div>
             </div>
         </div>
-        <div class="flex flex-row items-center">
-            <div class="flex flex-row items-center w-full border rounded-3xl h-12 px-2">
-                <button class="flex items-center justify-center h-10 w-10 text-gray-400 ml-1">
-                    <svg class="w-5 h-5"
-                         fill="none"
-                         stroke="currentColor"
-                         viewBox="0 0 24 24"
-                         xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
-                    </svg>
-                </button>
-                <div class="w-full">
-                    <input type="text" id="messageInput" class="border border-transparent w-full focus:outline-none text-sm h-10 flex items-center" placeholder="Type your message....">
-                </div>
-                <div class="flex flex-row">
-                    <button class="flex items-center justify-center h-10 w-8 text-gray-400">
-                        <svg class="w-5 h-5"
-                             fill="none"
-                             stroke="currentColor"
-                             viewBox="0 0 24 24"
-                             xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
-                        </svg>
-                    </button>
-                    <button class="flex items-center justify-center h-10 w-8 text-gray-400 ml-1 mr-2">
+        <div class="flex items-center space-x-4">
+            <div id="previewContainer" class="flex justify-center space-x-2 p-2"></div>
+
+            <div class="flex items-center w-full border rounded-3xl h-12 px-4">
+
+                <input type="text" id="messageInput" class="border-transparent w-full focus:outline-none text-sm h-10" placeholder="Type your message....">
+
+                <div class="flex items-center space-x-2">
+                    <button id="btn_image" class="flex items-center justify-center h-10 w-8 text-gray-400 ml-1 mr-2">
+                        <input type="file" id="fileInput" style="display: none;" accept="image/*,video/*">
                         <svg class="w-5 h-5"
                              fill="none"
                              stroke="currentColor"
@@ -311,7 +290,9 @@
 
 
     @vite('resources/js/chatRoom/affiche_user.js')
+    @vite('resources/js/chatRoom/btn_image.js')
     @vite('resources/js/bootstrap.js')
+
 
     <!-- Dans votre vue Blade (par exemple, dans resources/views/welcome.blade.php) -->
     <script>

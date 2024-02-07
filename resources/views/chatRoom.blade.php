@@ -9,9 +9,30 @@
 <!-- component -->
 <div class="flex flex-row h-[92vh] antialiased text-gray-800">
     <div class="flex flex-row w-96 flex-shrink-0 bg-gray-100 p-4">
+
         <div class="flex flex-col w-full h-full pl-4 pr-4 py-4 -mr-4">
+            <div class="flex items-center justify-center p-5">
+                <label for="toggleNotifications" class="flex items-center cursor-pointer">
+                    <!-- toggle -->
+                    <div class="relative">
+                        <!-- input -->
+                        <input id="toggleNotifications" type="checkbox" class="sr-only" />
+                        <!-- line -->
+                        <div class="w-10 h-4 bg-gray-400 rounded-full shadow-inner"></div>
+                        <!-- dot -->
+                        <div class="toggle-dot absolute w-6 h-6 bg-white rounded-full shadow -left-1 -top-1 transition"></div>
+                    </div>
+                    <!-- label -->
+                    <div class="ml-3 text-gray-700 font-medium">
+                        Activer les notifications
+                    </div>
+                </label>
+            </div>
+
             <div class="flex flex-row items-center">
+
                 <div class="flex flex-row items-center">
+
                     <div class="text-xl font-semibold">Messages</div>
                 </div>
                 <div class="ml-auto">
@@ -287,7 +308,25 @@
     </div>
 </div>
 
+    <!-- Pop-up container -->
+    <div id="notificationPopup" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" onclick="closePopup()">
+        <!-- Pop-up content -->
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white" onclick="event.stopPropagation()">
+            <div class="mt-3 text-center">
+                <div class="mx-auto flex items-center justify-between">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Gérer les notifications</h3>
+                    <button onclick="closePopup()" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" data-modal-toggle="notificationPopup">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    </button>
+                </div>
+                <div class="mt-2 px-7 py-3">
+                    <button id="btn-nft-enable" onclick="initFirebaseMessagingRegistration()" class="mt-3 mb-2 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Allow for Notification</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    @vite('resources/js/chatRoom/notif.js')
 
     @vite('resources/js/chatRoom/affiche_user.js')
     @vite('resources/js/chatRoom/btn_image.js')
@@ -295,7 +334,7 @@
 
 
     <!-- Dans votre vue Blade (par exemple, dans resources/views/welcome.blade.php) -->
-    <script>
+    <script defer>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/firebase-messaging-sw.js')
                 .then(function(registration) {
@@ -305,7 +344,42 @@
                     console.log('Service Worker Registration Failed', err);
                 });
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleNotifications = document.getElementById('toggleNotifications');
+            const toggleDot = document.querySelector('.toggle-dot');
+
+            // Appliquer les styles initiaux au dot toggle
+            toggleDot.style.position = 'absolute';
+            toggleDot.style.width = '24px'; // 6rem in Tailwind
+            toggleDot.style.height = '24px'; // 6rem in Tailwind
+            toggleDot.style.backgroundColor = 'white';
+            toggleDot.style.borderRadius = '9999px'; // rounded-full in Tailwind
+            toggleDot.style.boxShadow = '0 2px 4px 0 rgba(0,0,0,0.2)';
+            toggleDot.style.transition = 'transform 0.3s ease-in-out';
+            toggleDot.style.left = '-0.25rem'; // -1 in Tailwind
+            toggleDot.style.top = '-0.25rem'; // -1 in Tailwind
+
+            toggleNotifications.addEventListener('change', function () {
+                if (this.checked) {
+                    console.log("Notifications activées");
+                    initFirebaseMessagingRegistration()
+                    toggleDot.style.transform = 'translateX(100%)';
+                    toggleDot.style.backgroundColor = '#48bb78'; // green-500 in Tailwind
+                } else {
+                    console.log("Notifications désactivées");
+                    toggleDot.style.transform = 'translateX(0)';
+                    toggleDot.style.backgroundColor = 'white';
+                }
+            });
+        });
+
+
+
+
     </script>
+
+
 
     <script src="https://www.gstatic.com/firebasejs/7.23.0/firebase.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>

@@ -140,6 +140,8 @@ function createGroup() {
     })
         .then(() => {
             console.log('Groupe créé avec succès');
+            loadUserGroups()
+
         })
         .catch(error => {
             console.error('Erreur lors de la création du groupe', error);
@@ -147,7 +149,6 @@ function createGroup() {
     // Fermer la modale et réinitialiser l'état après la création du groupe
     closeModal();
     toggleGroupCreationMode();
-    loadUserGroups()
 }
 
 
@@ -444,7 +445,7 @@ function loadUserConversation() {
                 // Temps depuis la dernière activité (exemple statique '2 hours ago')
                 const timeElement = document.createElement('div');
                 timeElement.classList.add('absolute', 'text-xs', 'text-gray-500', 'right-0', 'top-0', 'mr-4', 'mt-3');
-                timeElement.textContent = '2 hours ago'; // Remplacer par une valeur dynamique si disponible
+                //timeElement.textContent = '2 hours ago'; // Remplacer par une valeur dynamique si disponible
 
                 // Icône (exemple statique avec 'T')
                 const iconElement = document.createElement('div');
@@ -459,7 +460,7 @@ function loadUserConversation() {
                 groupNameElement.textContent = otherMember ? `${otherMember.firstname} ${otherMember.lastname}` : 'Unknown';
                 const lastMessageElement = document.createElement('div');
                 lastMessageElement.classList.add('text-xs', 'truncate', 'w-40');
-                lastMessageElement.textContent = 'Good after noon! how can i help you?'; // Dernier message, remplacer par la donnée dynamique si disponible
+                //lastMessageElement.textContent = 'Good after noon! how can i help you?'; // Dernier message, remplacer par la donnée dynamique si disponible
 
                 // Nombre de nouveaux messages (exemple statique '3')
                 const newMessagesElement = document.createElement('div');
@@ -471,7 +472,7 @@ function loadUserConversation() {
                 // Assemblage des éléments
                 groupInfoElement.appendChild(groupNameElement);
                 groupInfoElement.appendChild(lastMessageElement);
-                newMessagesElement.appendChild(messagesCountElement);
+                //newMessagesElement.appendChild(messagesCountElement);
                 conversationElement.appendChild(timeElement);
                 conversationElement.appendChild(iconElement);
                 conversationElement.appendChild(groupInfoElement);

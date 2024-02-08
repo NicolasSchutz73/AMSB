@@ -65,8 +65,9 @@
                 <label for="roles" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 block text-md-end text-start">Roles</label>
                 <div>
                     <select class="w-full px-3 py-2 border rounded-lg @error('roles') border-red-500 @enderror" multiple aria-label="Roles" id="roles" name="roles[]">
+                        <option value="" selected disabled hidden>Choose a role...</option>
                         @forelse ($roles as $role)
-                            @if ($role!='Super Admin')
+                            @if ($role != 'Super Admin')
                                 <option value="{{ $role }}" {{ in_array($role, old('roles') ?? []) ? 'selected' : '' }}>
                                     {{ $role }}
                                 </option>
@@ -85,6 +86,7 @@
                     @endif
                 </div>
             </div>
+
 
             <!-- Description Field -->
             <div class="mb-4">
@@ -113,4 +115,19 @@
             </div>
         </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelector('form').addEventListener('submit', function (event) {
+                var rolesSelect = document.getElementById('roles');
+                if (rolesSelect.selectedOptions.length ===  0 || rolesSelect.selectedIndex ===  0) {
+                    event.preventDefault();
+                    alert('Please select at least one role.');
+                }
+            });
+        });
+    </script>
+
 </x-app-layout>
+
+

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreTeamRequest;
 use App\Http\Requests\UpdateTeamRequest;
 use App\Models\Team;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -89,19 +90,48 @@ class TeamController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Affiche le formulaire d'édition de l'équipe spécifié.
+     * @param Team $team
+     * @return View
      */
-    public function edit(Team $team)
+    public function edit(Team $team): View
     {
-        //
+        $allUsers = User::all();
+
+        return view('teams.edit', [
+            'team' => $team,
+            'allUsers' => $allUsers,
+        ]);
     }
 
     /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateTeamRequest $request, Team $team)
+     * Met à jour l'équipe spécifié en base de données.
+     * @param UpdateTeamRequest $request
+     * @param Team $team
+     * @return RedirectResponse
+    */
+    public function update(UpdateTeamRequest $request, Team $team): RedirectResponse
     {
-        //
+        $validatedData = $request->validated();
+
+        // Met à jour les propriétés de l'équipe
+        $team->update([
+            'name' => $validatedData['name'],
+            'category' => $validatedData['category'],
+        ]);
+
+        // Ajoute les utilisateurs à l'équipe
+        if (isset($validatedData['add_users'])) {
+            $team->users()->attach($validatedData['add_users']);
+        }
+
+        // Supprime les utilisateurs de l'équipe
+        if (isset($validatedData['remove_users'])) {
+            $team->users()->detach($validatedData['remove_users']);
+        }
+
+        // Redirige vers la page de détails de l'équipe
+        return redirect()->route('teams.show', $team->id)->with('success', 'L\'équipe a été mise à jour avec succès.');
     }
 
     /**

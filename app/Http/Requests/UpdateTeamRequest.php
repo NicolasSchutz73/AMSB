@@ -11,7 +11,7 @@ class UpdateTeamRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,12 @@ class UpdateTeamRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
+            'add_users' => 'array', // Valide que 'add_users' est un tableau
+            'add_users.*' => 'exists:users,id', // Valide que chaque élément de 'add_users' existe dans la table 'users'
+            'remove_users' => 'array', // Valide que 'remove_users' est un tableau
+            'remove_users.*' => 'exists:users,id', // Valide que chaque élément de 'remove_users' existe dans la table 'users'
         ];
     }
 }

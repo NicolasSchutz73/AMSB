@@ -9,6 +9,7 @@ use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\TeamController;
 
 /*
 |--------------------------------------------------------------------------
@@ -96,6 +97,24 @@ Route::resources([
     'users' => UserController::class, // Gestion des utilisateurs
     'chat' => ChatController::class, // Gestion de la messagerie
 ]);
+
+/*
+|--------------------------------------------------------------------------
+| Routes de gestion des équipes
+|--------------------------------------------------------------------------
+|
+| Ces routes permettent la gestion des équipes
+| Laravel générera automatiquement les routes nécessaires pour le CRUD des équipes.
+| GET /teams : Affiche la liste des équipes (index dans le contrôleur).
+| GET /teams/create : Affiche le formulaire de création d'équipe (create dans le contrôleur).
+| POST /teams : Traite la création d'une nouvelle équipe (store dans le contrôleur).
+| GET /teams/{team} : Affiche les détails d'une équipe spécifique (show dans le contrôleur).
+| GET /teams/{team}/edit : Affiche le formulaire de modification d'équipe (edit dans le contrôleur).
+| PUT/PATCH /teams/{team} : Traite la modification d'une équipe (update dans le contrôleur).
+| DELETE /teams/{team} : Supprime une équipe (destroy dans le contrôleur).
+*/
+
+Route::resource('teams', TeamController::class);
 
 
 /*

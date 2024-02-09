@@ -7,22 +7,23 @@ use Illuminate\Foundation\Http\FormRequest;
 class StoreTeamRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Détermine si l'utilisateur est autorisé à faire cette demande.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Récupère les règles de validation applicables à la demande.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            //
+            'name'     => 'required|string|max:255',
+            'category' => 'required|string|max:50',
         ];
     }
 }

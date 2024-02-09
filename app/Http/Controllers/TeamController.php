@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreTeamRequest;
 use App\Http\Requests\UpdateTeamRequest;
 use App\Models\Team;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class TeamController extends Controller
@@ -29,29 +30,40 @@ class TeamController extends Controller
      */
     public function index(): View
     {
-        // Récupérer toutes les équipes depuis la base de données en les triant par ID de manière décroissante et en les paginant
-        $teams = Team::latest('id')->paginate(8);
-
         // Passer les équipes paginées à la vue
         return view('teams.index', [
-            'teams' => $teams
+            'teams' => Team::latest('id')->paginate(8)
         ]);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Affiche le formulaire de création d'une nouvelle équipe.
+     * @return View
      */
-    public function create()
+    public function create(): View
     {
-        //
+        // Instancier un objet Team (vide) pour accéder aux noms des champs
+        $team = new Team;
+
+        // Passer les champs du modèle à la vue
+        return view('teams.create', compact('team'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Stocke une nouvelle équipe dans la base de données.
+     * @param StoreTeamRequest $request
+     * @return RedirectResponse
      */
-    public function store(StoreTeamRequest $request)
+    public function store(StoreTeamRequest $request): RedirectResponse
     {
-        //
+        // Valider les données du formulaire à l'aide du StoreTeamRequest
+        $validatedData = $request->validated();
+
+        // Créer une nouvelle équipe avec les données validées
+        $team = Team::create($validatedData);
+
+        // Rediriger vers la page de la liste des équipes avec un message
+        return redirect()->route('teams.index')->with('success', 'Équipe créée avec succès.');
     }
 
     /**

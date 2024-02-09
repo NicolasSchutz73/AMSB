@@ -43,11 +43,14 @@ class TeamController extends Controller
      */
     public function create(): View
     {
+        // Récupère tous les utilisateurs disponibles
+        $allUsers = User::all();
+
         // Instancier un objet Team (vide) pour accéder aux noms des champs
         $team = new Team;
 
         // Passer les champs du modèle à la vue
-        return view('teams.create', compact('team'));
+        return view('teams.create', compact('team', 'allUsers'));
     }
 
     /**
@@ -61,7 +64,16 @@ class TeamController extends Controller
         $validatedData = $request->validated();
 
         // Créer une nouvelle équipe avec les données validées
-        $team = Team::create($validatedData);
+        $team = Team::create([
+            'name' => $validatedData['name'],
+            'category' => $validatedData['category'],
+            // Ajoute d'autres propriétés si nécessaire
+        ]);
+
+        // Attacher les utilisateurs à l'équipe
+        if (isset($validatedData['add_users'])) {
+            $team->users()->attach($validatedData['add_users']);
+        }
 
         // Rediriger vers la page de la liste des équipes avec un message
         return redirect()->route('teams.index')->with('success', 'Équipe créée avec succès.');

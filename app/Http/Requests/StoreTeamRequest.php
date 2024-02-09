@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreTeamRequest extends FormRequest
 {
@@ -24,6 +25,11 @@ class StoreTeamRequest extends FormRequest
         return [
             'name'     => 'required|string|max:255',
             'category' => 'required|string|max:50',
+            'add_users' => [
+                'nullable',
+                'array',
+                Rule::exists('users', 'id'),
+            ],
         ];
     }
 }

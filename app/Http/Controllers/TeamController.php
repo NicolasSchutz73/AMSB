@@ -135,10 +135,15 @@ class TeamController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Supprime l'équipe spécifiée de la base de données.
+     * @param Team $team
+     * @return RedirectResponse
      */
-    public function destroy(Team $team)
+    public function destroy(Team $team):RedirectResponse
     {
-        //
+        // Supprime l'équipe de la base de données
+        $team->delete();
+
+        return redirect()->route('teams.index');
     }
 }

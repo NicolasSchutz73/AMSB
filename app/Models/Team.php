@@ -8,4 +8,26 @@ use Illuminate\Database\Eloquent\Model;
 class Team extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'category'
+    ];
+
+    // Relation Many-to-Many avec les utilisateurs (joueurs et parents)
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'team_user', 'team_id', 'user_id')->withTimestamps();
+    }
+
+    // Relation Many-to-Many avec les coachs
+    public function coach()
+    {
+        // Utilise la relation Many-to-Many 'users()' pour récupérer tous les utilisateurs liés à l'équipe
+        return $this->users()->whereHas('roles', function ($query) {
+            // Filtre les utilisateurs ayant le rôle "coach"
+            $query->where('name', 'coach');
+        });
+    }
+
 }

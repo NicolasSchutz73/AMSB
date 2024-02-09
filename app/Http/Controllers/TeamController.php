@@ -32,7 +32,7 @@ class TeamController extends Controller
     {
         // Passer les équipes paginées à la vue
         return view('teams.index', [
-            'teams' => Team::latest('id')->paginate(8)
+            'teams' => Team::orderBy('id')->paginate(8)
         ]);
     }
 
@@ -67,11 +67,25 @@ class TeamController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Affiche les détails de l'équipe spécifiée.
+     * @param Team $team
+     * @return View
      */
-    public function show(Team $team)
+    public function show(Team $team): View
     {
-        //
+        // Charger les utilisateurs liés à cette équipe
+        $users = $team->users;
+
+        // Charger les entraineurs liés à cette équipe
+        $coaches = $team->users()->whereHas('roles', function ($query) {
+            $query->where('name', 'coach');
+        })->get();
+
+        return view('teams.show', [
+            'team' => $team,
+            'users' => $users,
+            'coaches' => $coaches,
+        ]);
     }
 
     /**

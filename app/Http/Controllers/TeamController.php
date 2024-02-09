@@ -5,15 +5,37 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreTeamRequest;
 use App\Http\Requests\UpdateTeamRequest;
 use App\Models\Team;
+use Illuminate\View\View;
 
 class TeamController extends Controller
 {
+
     /**
-     * Display a listing of the resource.
+     * Constructeur de la classe UserController.
+     * Applique les middlewares d'authentification et de permissions.
      */
-    public function index()
+    public function __construct()
     {
-        //
+        $this->middleware('auth');
+        $this->middleware('permission:create-team|edit-team|delete-team', ['only' => ['index','show']]);
+        $this->middleware('permission:create-team', ['only' => ['create','store']]);
+        $this->middleware('permission:edit-team', ['only' => ['edit','update']]);
+        $this->middleware('permission:delete-team', ['only' => ['destroy']]);
+    }
+
+    /**
+     * Affiche la liste des équipes.
+     * @return View
+     */
+    public function index(): View
+    {
+        // Récupérer toutes les équipes depuis la base de données en les triant par ID de manière décroissante et en les paginant
+        $teams = Team::latest('id')->paginate(8);
+
+        // Passer les équipes paginées à la vue
+        return view('teams.index', [
+            'teams' => $teams
+        ]);
     }
 
     /**

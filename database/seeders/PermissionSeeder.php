@@ -21,6 +21,9 @@ class PermissionSeeder extends Seeder
             'create-user',
             'edit-user',
             'delete-user',
+            'create-team',
+            'edit-team',
+            'delete-team',
         ];
 
         // On boucle sur le tableau permissions pour les insérer dans la table des permissions

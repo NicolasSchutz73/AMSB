@@ -116,6 +116,18 @@ Route::resources([
 
 Route::resource('teams', TeamController::class);
 
+/*
+|--------------------------------------------------------------------------
+| Routes de l'équipe d'un utilisateur
+|--------------------------------------------------------------------------
+| Cette route est utilisées pour qu'un utilisateur puisse voir son équipe.
+|
+*/
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/my-teams', [TeamController::class, 'showUserTeams'])->name('my.teams');
+});
+
 
 /*
 |--------------------------------------------------------------------------

@@ -35,6 +35,12 @@
                             {{ __('Rôles') }}
                         </x-nav-link>
                     </div>
+
+                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                        <x-nav-link :href="route('teams.index')" :active="request()->routeIs('teams.index')">
+                            {{ __('Équipes') }}
+                        </x-nav-link>
+                    </div>
                 @endcanany
 
 <!--                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
@@ -50,8 +56,8 @@
                 </div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('teams.index')" :active="request()->routeIs('teams.index')">
-                        {{ __('Équipes') }}
+                    <x-nav-link :href="route('my.teams')" :active="request()->routeIs('my.teams')">
+                        {{ __('Mon équipe') }}
                     </x-nav-link>
                 </div>
             </div>

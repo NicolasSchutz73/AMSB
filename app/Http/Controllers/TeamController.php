@@ -158,4 +158,13 @@ class TeamController extends Controller
 
         return redirect()->route('teams.index');
     }
+
+    public function showUserTeams()
+    {
+        $user = auth()->user();
+        $teams = $user->team()->get(); // Récupérer toutes les équipes associées à l'utilisateur
+
+        return view('user_teams.show', ['teams' => $teams]);
+    }
+
 }

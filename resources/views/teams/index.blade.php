@@ -1,32 +1,56 @@
-<h1>Liste des équipes</h1>
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="mb-1 font-semibold text-xl text-neutral-900 dark:text-gray-100">Gérer les équipes</h2>
+        <p class="text-sm text-neutral-600 dark:text-gray-300">Voici la liste des équipes disponible.</p>
+    </x-slot>
 
-@can('create-teams')
-    <a href="{{ route('teams.create') }}">
-        Ajouter une équipe
-    </a>
-@endcan
-
-@forelse ($teams as $team)
-    <div>
-        <span>ID : {{ $loop->iteration }}</span>
-        <span>Nom : {{ $team->name }}</span>
-        <span>Catégorie : {{ $team->category }}</span>
-        <a href="{{ route('teams.show', $team->id) }}">Voir</a>
-
-        @can('edit-teams')
-            <a href="{{ route('teams.edit', $team->id) }}">Modifier</a>
+    <div class="p-6">
+        @can('create-teams')
+            <a href="{{ route('teams.create') }}" class="inline-flex items-center justify-center mb-4 px-4 py-2 border border-neutral-900 dark:border-gray-100 text-neutral-900 dark:text-gray-100 rounded-md shadow-sm hover:bg-neutral-900 dark:hover:bg-gray-100 hover:text-gray-100 dark:hover:text-neutral-900 focus:outline-none focus:ring-2 focus:ring-offset-2">
+                Créer une équipe
+            </a>
         @endcan
 
-        @can('delete-team')
-            <form action="{{ route('teams.destroy', $team->id) }}" method="post" style="display: inline;">
-                @csrf
-                @method('DELETE')
-                <button type="submit" onclick="return confirm('Voulez-vous supprimer cette équipe ?');">Supprimer</button>
-            </form>
-        @endcan
+            @forelse ($teams as $team)
+
+                <div class="relative overflow-x-auto sm:rounded-lg">
+                    <table class="w-full text-sm text-left text-gray-400">
+                        <thead class="text-xs uppercase text-gray-100 dark:text-neutral-900 bg-neutral-900 dark:bg-gray-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">ID</th>
+                                <th scope="col" class="px-6 py-3">Nom</th>
+                                <th scope="col" class="px-6 py-3">Catégorie</th>
+                                <th scope="col" class="px-6 py-3">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="bg-white border-b hover:bg-gray-50">
+                                <td class="px-6 py-4 text-sm text-neutral-600">{{ $loop->iteration }}</td>
+                                <td class="px-6 py-4 text-sm text-neutral-600">{{ $team->name }}</td>
+                                <td class="px-6 py-4 text-sm text-neutral-600">{{ $team->category }}</td>
+                                <td class="px-6 py-4 text-sm text-neutral-600">
+
+                                    <a href="{{ route('teams.show', $team->id) }}" class="text-yellow-500 hover:underline pr-4">Voir</a>
+
+                                    @can('edit-teams')
+                                        <a href="{{ route('teams.edit', $team->id) }}" class="font-medium text-blue-500 hover:underline pr-4">Modifier</a>
+                                    @endcan
+
+                                    @can('delete-team')
+                                        <form action="{{ route('teams.destroy', $team->id) }}" method="post" style="display: inline;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" onclick="return confirm('Voulez-vous supprimer cette équipe ?');" class="font-medium text-red-500 hover:underline pr-4">Supprimer</button>
+                                        </form>
+                                    @endcan
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                @empty
+                    <p class="text-danger text-center py-10">Aucune équipe disponible pour le moment.</p>
+                @endforelse
+            </div>
+        {{ $teams->links() }}
     </div>
-@empty
-    <p>Aucune équipe disponible pour le moment.</p>
-@endforelse
-
-{{ $teams->links() }}  {{-- Affiche la pagination si nécessaire --}}
+</x-app-layout>

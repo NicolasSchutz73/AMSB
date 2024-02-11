@@ -164,7 +164,27 @@ class TeamController extends Controller
         $user = auth()->user();
         $teams = $user->team()->get(); // Récupérer toutes les équipes associées à l'utilisateur
 
-        return view('user_teams.show', ['teams' => $teams]);
+        $teamDetails = []; // Array pour stocker les détails de chaque équipe
+
+        foreach ($teams as $team) {
+            // Charger les utilisateurs liés à cette équipe
+            $users = $team->users;
+
+            // Charger les entraîneurs liés à cette équipe
+            $coaches = $team->users()->whereHas('roles', function ($query) {
+                $query->where('name', 'coach');
+            })->get();
+
+            // Stocker les détails de l'équipe dans le tableau
+            $teamDetails[$team->id] = [
+                'team' => $team,
+                'users' => $users,
+                'coaches' => $coaches,
+            ];
+        }
+
+        return view('user_teams.show', ['teamDetails' => $teamDetails]);
     }
+
 
 }

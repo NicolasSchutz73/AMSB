@@ -33,7 +33,9 @@
                         <label for="add_users" class="block text-neutral-900 text-sm font-bold mb-2">Ajouter des utilisateurs :</label>
                         <select name="add_users[]" multiple class="block w-full shadow-sm focus:ring-neutral-900 focus:border-neutral-900 border-neutral-300 rounded-md" style="height: 210px;">
                             @foreach ($allUsers as $user)
-                                <option value="{{ $user->id }}">{{ $user->firstname }} {{ $user->lastname }}</option>
+                                <option value="{{ $user->id }}">
+                                    {{ $user->firstname }} {{ $user->lastname }} - Rôle: {{ implode(', ', $user->getRoleNames()->toArray()) }}
+                                </option>
                             @endforeach
                         </select>
                     </div>

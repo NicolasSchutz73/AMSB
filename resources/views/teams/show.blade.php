@@ -34,7 +34,7 @@
                     @elseif ($coaches->count() > 1)
                         Entraineurs de l'équipe :
                     @else
-                        Aucun entraineur dans cette équipe pour le moment
+                        Entraineur de l'équipe :
                     @endif
                 </h3>
 
@@ -52,13 +52,6 @@
                     return $user->hasRole('parents');
                 }) as $parent)
                     <div>
-                        <span>
-                            @forelse ($parent->getRoleNames() as $role)
-                                <span class="capitalize">{{ $role }} :</span>
-                            @empty
-                                Aucun rôle assigné
-                            @endforelse
-                        </span>
                         <span class="mb-2">{{ $parent->firstname }} {{ $parent->lastname }}</span>
                     </div>
                 @empty

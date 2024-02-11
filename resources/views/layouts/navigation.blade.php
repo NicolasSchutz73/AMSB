@@ -124,6 +124,9 @@
                 <x-responsive-nav-link :href="route('roles.index')" :active="request()->routeIs('roles.index')">
                     {{ __('Rôles') }}
                 </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('teams.index')" :active="request()->routeIs('teams.index')">
+                    {{ __('Équipes') }}
+                </x-responsive-nav-link>
             @endcanany
             <x-responsive-nav-link :href="route('notification')" :active="request()->routeIs('notification')">
                 {{ __('Notification') }}
@@ -133,6 +136,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('chat-room-users')" :active="request()->routeIs('chat-room-users')">
                 {{ __('Chat room') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('my.teams')" :active="request()->routeIs('my.teams')">
+                {{ __('Mon équipe') }}
             </x-responsive-nav-link>
         </div>
 

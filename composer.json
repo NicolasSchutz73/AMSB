@@ -7,6 +7,7 @@
     "require": {
         "php": "^8.2",
         "doctrine/dbal": "^3.7",
+        "google/apiclient": "^2.0",
         "guzzlehttp/guzzle": "^7.2",
         "ladumor/laravel-pwa": "^0.0.4",
         "laravel/framework": "^10.10",

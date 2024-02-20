@@ -26,13 +26,13 @@ class UserController extends Controller
     }
 
     /**
-     * Affiche la liste des utilisateurs.
+     * Affiche la liste des utilisateurs pour users
      * @return View
      */
     public function index(): View
     {
         return view('users.index', [
-            'users' => User::latest('id')->paginate(3)
+            'users' => User::latest('id')->paginate(15)
         ]);
 
     }
@@ -65,7 +65,7 @@ class UserController extends Controller
     }
 
     /**
-     * Affiche les détails de l'utilisateur spécifié.
+     * Affiche les détails de l'utilisateur spécifié pour users
      * @param User $user
      * @return View
      */

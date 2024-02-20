@@ -2,12 +2,13 @@
 
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\RoleController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\SearchUserController;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\TeamController;
 
@@ -35,6 +36,11 @@ Route::get('/calendar', function () {
     return view('calendar');
 })->middleware(['auth', 'verified'])->name('calendar');
 
+// Recherche d'utilisateurs - Accessible uniquement aux utilisateurs authentifiés et vérifiés
+Route::get('/search-user', function () {
+    return view('searchUser.index');
+})->middleware(['auth', 'verified'])->name('searchUser.index');
+
 /*
 |--------------------------------------------------------------------------
 | Routes de gestion de profil
@@ -49,6 +55,16 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+/*
+|--------------------------------------------------------------------------
+| Routes de page user
+|--------------------------------------------------------------------------
+|
+|
+*/
+
+Route::get('/search-user', [SearchUserController::class, 'index'])->name('searchUser.index');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -62,7 +78,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     // Salle de chat
     Route::get('/chat-room', [GroupController::class, 'chatRoom'])->name('chat-room');
-    Route::get('/chat-room-users', [UserController::class, 'chatRoomUsers'])->name('chat-room-users');
+    Route::get('/chat-room-users', [SearchUserController::class, 'chatRoomUsers'])->name('chat-room-users');
 
     // Groupes et conversations
     Route::resource('groups', GroupController::class);
@@ -155,11 +171,11 @@ Route::post('/send-notification', [App\Http\Controllers\HomeController::class, '
 */
 
 // Accès à l'information de l'utilisateur
-Route::get('/userinfo', [UserController::class, 'getUserInfo'])->middleware('auth');
+Route::get('/userinfo', [SearchUserController::class, 'getUserInfo'])->middleware('auth');
 
 // Endpoint API pour lister les utilisateurs - Utiliser dans api.php pour une réponse JSON
-Route::get('/api/users', [UserController::class, 'apiIndex'])->middleware('auth');
-Route::get('/usersjson', [UserController::class, 'apiIndex']); // À déplacer dans api.php pour une réponse JSON
+Route::get('/api/users', [SearchUserController::class, 'apiIndex'])->middleware('auth');
+Route::get('/usersjson', [SearchUserController::class, 'apiIndex']); // À déplacer dans api.php pour une réponse JSON
 
 /*
 |--------------------------------------------------------------------------

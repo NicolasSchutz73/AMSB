@@ -21,12 +21,19 @@ class UserFactory extends Factory
      *
      * @return array<string, mixed>
      */
+
     public function definition(): array
     {
+        // Configurer Faker pour utiliser la locale française
+        $this->faker->locale('fr_FR');
+
         return [
-            'name' => fake()->name(),
+            'firstname' => fake()->firstname(),
+            'lastname' => fake()->lastname(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
+            'description' => fake()->paragraph(),
+            'emergency' => fake()->phoneNumber(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
         ];

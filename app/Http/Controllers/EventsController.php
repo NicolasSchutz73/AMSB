@@ -37,19 +37,30 @@ class EventsController extends Controller
         // Formater les événements
         $formattedEvents = [];
         foreach ($events as $event) {
-            $formattedEvents[] = [
-                'id' => $event->getId(),
+
+            // Récupérer l'identifiant de l'événement
+            $eventId = $event->getId();
+
+            $recuring = $event->getRecurringEventId();
+            $isRecurrent = false;
+
+            // Si l'événement est récurrent et qu'il existe déjà dans la liste des événements formatés, passer à l'événement suivant
+            if ($recuring != null) {
+                $isRecurrent = true;
+            }
+
+            // Ajouter l'événement à la liste des événements formatés
+            $formattedEvents[$eventId] = [
+                'id' => $eventId,
                 'title' => $event->getSummary(),
                 'description' => $event->getDescription(),
                 'location' => $event->getLocation(),
                 'start' => $event->getStart()->dateTime ?: $event->getStart()->date,
                 'end' => $event->getEnd()->dateTime ?: $event->getEnd()->date,
                 'attendees' => $event->getAttendees(),
+                'isRecurring' => $isRecurrent, // Indiquer si l'événement est récurrent
             ];
         }
-
-
-
 
         // Créer des objets Event à partir des données formatées
         $eventObjects = [];
@@ -59,9 +70,10 @@ class EventsController extends Controller
                 $eventData['title'],
                 $eventData['start'],
                 $eventData['end'],
-                $eventData['description'], // Ajout de la description
-                $eventData['location'], // Ajout du lieu
-                $eventData['attendees'] // Ajout des participants
+                $eventData['description'],
+                $eventData['location'],
+                $eventData['attendees'],
+                $eventData['isRecurring'] // Utilisez la clé correcte pour déterminer si l'événement est récurrent
             );
             $eventObjects[] = $event;
         }

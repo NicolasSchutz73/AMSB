@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-namespace App\Models;
-
 class Event {
     public $id;
     public $title;
@@ -12,8 +10,9 @@ class Event {
     public $start;
     public $end;
     public $attendees;
+    public $isRecurring;
 
-    public function __construct($id, $title, $start, $end, $description = null, $location = null, $attendees = null) {
+    public function __construct($id, $title, $start, $end, $description = null, $location = null, $attendees = null, $isRecurring = false) {
         $this->id = $id;
         $this->title = $title;
         $this->description = $description;
@@ -21,5 +20,6 @@ class Event {
         $this->start = $start;
         $this->end = $end;
         $this->attendees = $attendees;
+        $this->isRecurring = $isRecurring;
     }
 }

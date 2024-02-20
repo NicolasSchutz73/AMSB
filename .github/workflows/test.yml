@@ -1,0 +1,18 @@
+on:
+  push:
+    branches:
+      - '**'
+
+name: Discord Notification
+
+jobs:
+  notify:
+    name: Discord Notification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: fateyan/action-discord-notifier@v1
+        with:
+          message-title: New Commits Pushed
+          webhook: https://discord.com/api/webhooks/1209511055123026064/-hqqb9DJyapV04rmUGVwPTJALHN8kz9SduoE3Xkv1Btg-nA1_ryZsWaV-b7oDZPRgfIN/secret

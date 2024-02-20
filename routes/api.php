@@ -39,3 +39,7 @@ Route::post('/send-notification', [App\Http\Controllers\HomeController::class, '
 
 
 Route::post('/send-notification-group', [GroupController::class, 'sendNotificationGroup'])->middleware('auth:sanctum');
+
+
+Route::get('/events', [\App\Http\Controllers\EventsController::class, 'getEvents']);
+

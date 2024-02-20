@@ -1,0 +1,17 @@
+name: Discord Notification on Push
+
+on: [push]
+
+jobs:
+  notification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: Send Notification to Discord
+        uses: Ilshidur/action-discord@master
+        with:
+          args: "Un nouveau push a été effectué sur le dépôt : ${{ github.repository }} par ${{ github.actor }}."
+        env:
+          DISCORD_WEBHOOK: DISCORD_WEBHOOK

@@ -73,7 +73,7 @@ class EventsController extends Controller
                 $eventData['description'],
                 $eventData['location'],
                 $eventData['attendees'],
-                $eventData['isRecurring'] // Utilisez la clé correcte pour déterminer si l'événement est récurrent
+                $eventData['isRecurring']
             );
             $eventObjects[] = $event;
         }

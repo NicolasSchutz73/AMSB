@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Group;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class GroupController extends Controller
 {
@@ -102,15 +103,21 @@ class GroupController extends Controller
     {
         $messages = $group->messages()->with('user')->get();
 
-        // Transformer les messages pour inclure les détails de l'utilisateur
+        // Transformer les messages pour inclure les détails de l'utilisateur et du fichier
         $transformedMessages = $messages->map(function ($message) {
-            return [
+            $messageData = [
                 'id' => $message->id,
                 'content' => $message->content,
-                'user_id' => $message->user->id, // Récupération de l'ID de l'utilisateur
-                'user_firstname' => $message->user->firstname, // Récupération du prénom de l'utilisateur
-                'user_lastname' => $message->user->lastname, // Récupération du nom de l'utilisateur
+                'user_id' => $message->user->id,
+                'user_firstname' => $message->user->firstname,
+                'user_lastname' => $message->user->lastname,
+                'file_path' => $message->file_path ?? null,
+                'file_type' => $message->file_type ?? null,
+                'file_size' => $message->file_size ?? null,
             ];
+
+
+            return $messageData;
         });
 
         return response()->json(['messages' => $transformedMessages]);

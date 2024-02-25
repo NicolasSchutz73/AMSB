@@ -6,6 +6,7 @@ use App\Events\ChatMessageEvent;
 use App\Events\GroupChatMessageEvent;
 use App\Models\Message;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ChatController extends Controller
 {
@@ -32,24 +33,55 @@ class ChatController extends Controller
 
     public function store(Request $request)
     {
-        $groupId = $request->input('groupId');
-        $messageText = $request->input('message');
+        $request->validate([
+            'groupId' => 'required|integer',
+            'message' => 'nullable|string',
+            'file' => 'nullable|file|max:1024000', // Limite de 10 MB pour les fichiers
+        ]);
 
-        // Créer et enregistrer le message
         $message = new Message();
-        $message->group_id = $groupId;
+        $message->group_id = $request->input('groupId');
         $message->user_id = auth()->id();
-        $message->content = $messageText;
-        $message->save();
+        $message->content = $request->input('message'); // Enregistrez le message texte s'il est présent
 
-        // Récupérer le nom complet de l'utilisateur pour l'afficher dans le chat
+        // Vérifiez si un fichier est attaché et traitez-le
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs('data_message', $filename, 'public'); // Stockez le fichier
+
+            // Enregistrez les détails du fichier dans la base de données
+            $message->file_path = $filePath;
+            $message->file_type = $file->getClientMimeType();
+            $message->file_size = $file->getSize();
+        }
+
+        $message->save(); // Sauvegardez le message dans la base de données
+
+        // Récupérez le nom complet de l'utilisateur pour l'afficher dans le chat
         $firstname = auth()->user()->firstname;
         $lastname = auth()->user()->lastname;
 
-        // Déclenche l'événement de diffusion du message
-        event(new GroupChatMessageEvent($groupId, $message, $firstname,$lastname));
+        // Déclenchez l'événement de diffusion du message
+        event(new GroupChatMessageEvent(
+            $request->input('groupId'),
+            $message,
+            $firstname,
+            $lastname,
+            $message->file_path ,
+            $message->file_type
+        ));
+        Log::info($message);
+        // Incluez les détails du fichier dans la réponse JSON
+        return response()->json([
+            'success' => true,
+            'messageId' => $message->id,
+            'messageContent' => $message->content,
+            'filePath' => $message->file_path ? asset('storage/' . $message->file_path) : null,
+            'fileType' => $message->file_type,
+            'fileSize' => $message->file_size,
+        ]);
 
-        return response()->json(['success' => 'Message envoyé']);
     }
 
 

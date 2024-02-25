@@ -215,14 +215,15 @@ function loadUserGroups() {
 function loadPreviousMessages(groupId) {
     axios.get(`/group-chat/${groupId}/messages`)
         .then(response => {
+            console.log(response.data)
             const messages = response.data.messages;
             const chatDiv = document.querySelector('.grid.grid-cols-12.gap-y-2');
             chatDiv.innerHTML = ''; // Efface les messages précédents avant de charger les nouveaux
 
             messages.forEach(message => {
                 // Vérifiez que vous avez bien les propriétés user_firstname et user_lastname dans chaque message
-                appendMessageToChat(message.content, message.user_id, message.user_firstname, message.user_lastname);
-                console.log(message.content, message.user_id, message.user_firstname, message.user_lastname)
+                appendMessageToChat(message.content, message.user_id, message.user_firstname, message.user_lastname, message.file_path, message.file_type);
+                console.log(message.content, message.user_id, message.user_firstname, message.user_lastname, message.file_path, message.file_type)
             });
             const lastMessageElement = chatDiv.lastElementChild;
             if (lastMessageElement) {
@@ -262,8 +263,9 @@ function subscribeToGroupChannel(groupId) {
     if (!groupChannels[groupId]) {
         groupChannels[groupId] = window.Echo.private(`group.${groupId}`)
             .listen('GroupChatMessageEvent', (e) => {
-                console.log(e.message.content,e.message.id, e.message.firstname, e.message.lastname)
-                appendMessageToChat(e.message.content,e.message.id, e.message.firstname, e.message.lastname);
+                console.log("message contient " + e.message.content,e.message.id, e.message.firstname, e.message.lastname,e.message.file_path, e.message.file_type)
+                appendMessageToChat(e.message.content,e.message.id, e.message.firstname, e.message.lastname,e.message.file_path, e.message.file_type);
+                loadPreviousMessages(groupId);
             });
     }
 }
@@ -292,28 +294,43 @@ function sendMessage() {
     const fileInput = document.getElementById('fileInput');
     const previewContainer = document.getElementById('previewContainer');
 
-    if (!messageContent.trim() || !currentGroupId) {
-        console.error('Message content is empty or no group selected');
+    if (!currentGroupId) {
+        console.error('No group selected');
         return;
     }
 
-    axios.post(`/group-chat/${currentGroupId}/send`, {
-        groupId: currentGroupId,
-        message: messageContent
+    // Création d'un objet FormData
+    const formData = new FormData();
+    formData.append('groupId', currentGroupId);
+    if (messageContent.trim()) {
+        formData.append('message', messageContent);
+    }
+    if (fileInput.files.length > 0) {
+        formData.append('file', fileInput.files[0]);
+    }
+
+
+
+    axios.post(`/group-chat/${currentGroupId}/send`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
     })
         .then(() => {
-            //appendMessageToChat(messageContent, globalUserId, globalFirstname, globalLastname);
             messageInput.value = '';
-            loadPreviousMessages(currentGroupId)
-            triggerPushNotification(currentGroupId, messageContent, globalUserId)
             previewContainer.innerHTML = ''; // Effacer l'aperçu
             fileInput.value = ''; // Réinitialiser l'input de fichier
 
+            loadPreviousMessages(currentGroupId);
+            triggerPushNotification(currentGroupId, messageContent, globalUserId);
         })
         .catch(error => {
             console.error('Erreur d\'envoi', error);
         });
 }
+
+// Le reste du code pour la gestion de l'input de fichier et de l'aperçu reste inchangé
+
 
 
 
@@ -321,7 +338,8 @@ function sendMessage() {
 // Liez cette fonction au bouton d'envoi ou à l'événement 'submit' du formulaire de message.
 
 
-function appendMessageToChat(messageContent, authorID, authorFirstname, authorLastname) {
+function appendMessageToChat(messageContent, authorID, authorFirstname, authorLastname,filePath, fileType) {
+    console.log(filePath, fileType)
     const chatDiv = document.querySelector('.grid.grid-cols-12.gap-y-2');
     const messageElement = document.createElement('div');
 
@@ -361,6 +379,26 @@ function appendMessageToChat(messageContent, authorID, authorFirstname, authorLa
     } else {
         flexDiv.appendChild(messageContentDiv);
         flexDiv.appendChild(authorDiv);
+    }
+
+    if (filePath) {
+        const fileElement = document.createElement('div');
+        fileElement.className = 'mt-2';
+
+        if (fileType.startsWith('image/')) {
+            const img = document.createElement('img');
+            img.src = filePath;
+            img.className = 'max-w-full h-auto rounded-lg';
+            fileElement.appendChild(img);
+        } else if (fileType.startsWith('video/')) {
+            const video = document.createElement('video');
+            video.src = filePath;
+            video.controls = true;
+            video.className = 'max-w-full h-auto rounded-lg';
+            fileElement.appendChild(video);
+        }
+
+        messageContentDiv.appendChild(fileElement);
     }
 
     messageElement.appendChild(authorInfoDiv);

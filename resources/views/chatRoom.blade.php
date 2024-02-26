@@ -228,7 +228,7 @@
 
                 <div class="flex items-center space-x-2">
                     <button id="btn_image" class="flex items-center justify-center h-10 w-8 text-gray-400 ml-1 mr-2">
-                        <input type="file" id="fileInput" style="display: none;" accept="image/*,video/*">
+                        <input type="file" id="fileInput" style="display: none;" accept="image/*,video/*" multiple>
                         <svg class="w-5 h-5"
                              fill="none"
                              stroke="currentColor"

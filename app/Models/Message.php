@@ -9,7 +9,7 @@ class Message extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['group_id', 'user_id', 'content', 'file_path', 'file_type', 'file_size'];
+    protected $fillable = ['group_id', 'user_id', 'content'];
 
     /**
      * Obtient le groupe associé au message.
@@ -24,10 +24,12 @@ class Message extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function getFilePathAttribute($value)
+
+    public function files()
     {
-        return $value ? asset('storage/' . $value) : null;
+        return $this->hasMany(File::class);
     }
+
 
 
     // Vous pouvez ajouter des méthodes supplémentaires ici si nécessaire

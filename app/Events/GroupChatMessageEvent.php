@@ -21,27 +21,31 @@ class GroupChatMessageEvent implements ShouldBroadcast
     public $fileType; // Ajouté
 
 
-    public function __construct($groupId, $message, $firstname,$lastname, $filePath = null, $fileType = null)
+    public function __construct($groupId, $message, $firstname,$lastname)
     {
         $this->groupId = $groupId;
         $this->message = $message;
         $this->firstname = $firstname;
         $this->lastname = $lastname;
-        $this->filePath = $filePath ;
-        $this->fileType = $fileType; }
+
+    }
 
     public function broadcastWith()
     {
+        $files = $this->message->files()->get(['file_path', 'file_type', 'file_size'])->toArray();
+        LOG::info("message files :", $files);
         return [
             'message' => [
                 'id' => $this->message->id,
                 'content' => $this->message->content,
                 'firstname' => $this->firstname,
                 'lastname' => $this->lastname,
-                'filePath' => $this->filePath,
-                'fileType' => $this->fileType,]
+                'files' => $files, // Inclure les fichiers associés
 
+            ]
         ];
+
+
     }
 
 

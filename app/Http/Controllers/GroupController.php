@@ -101,27 +101,31 @@ class GroupController extends Controller
 
     public function getMessages(Group $group)
     {
-        $messages = $group->messages()->with('user')->get();
+        $messages = $group->messages()->with(['user', 'files'])->get(); // Assurez-vous de charger aussi les fichiers associés
 
-        // Transformer les messages pour inclure les détails de l'utilisateur et du fichier
+        // Transformer les messages pour inclure les détails de l'utilisateur et les fichiers
         $transformedMessages = $messages->map(function ($message) {
-            $messageData = [
+            $files = $message->files->map(function ($file) {
+                return [
+                    'file_path' => asset('storage/' . $file->file_path), // Utilisez asset() si vous voulez obtenir une URL complète
+                    'file_type' => $file->file_type,
+                    'file_size' => $file->file_size,
+                ];
+            });
+
+            return [
                 'id' => $message->id,
                 'content' => $message->content,
-                'user_id' => $message->user->id,
-                'user_firstname' => $message->user->firstname,
+                'user_id' => $message->user_id,
+                'user_firstname' => $message->user->firstname, // Assurez-vous que ces champs existent sur votre modèle User
                 'user_lastname' => $message->user->lastname,
-                'file_path' => $message->file_path ?? null,
-                'file_type' => $message->file_type ?? null,
-                'file_size' => $message->file_size ?? null,
+                'files' => $files, // Inclure les fichiers comme un tableau
             ];
-
-
-            return $messageData;
         });
 
         return response()->json(['messages' => $transformedMessages]);
     }
+
 
 
 

@@ -132,14 +132,12 @@ function createGroup() {
         .map(checkbox => checkbox.getAttribute('data-user-id'));
     const groupName = document.getElementById('groupNameInput').value; // Récupère la valeur du champ de saisie du nom du groupe
 
-    console.log("Créer un groupe nommé:", groupName, "avec les utilisateurs IDs:", selectedUserIds);
 
     axios.post('/create-group', {
         groupName: groupName,
         userIds: selectedUserIds
     })
         .then(() => {
-            console.log('Groupe créé avec succès');
             loadUserGroups()
 
         })
@@ -215,15 +213,16 @@ function loadUserGroups() {
 function loadPreviousMessages(groupId) {
     axios.get(`/group-chat/${groupId}/messages`)
         .then(response => {
-            console.log(response.data)
+           console.log(response.data)
             const messages = response.data.messages;
             const chatDiv = document.querySelector('.grid.grid-cols-12.gap-y-2');
             chatDiv.innerHTML = ''; // Efface les messages précédents avant de charger les nouveaux
 
             messages.forEach(message => {
                 // Vérifiez que vous avez bien les propriétés user_firstname et user_lastname dans chaque message
-                appendMessageToChat(message.content, message.user_id, message.user_firstname, message.user_lastname, message.file_path, message.file_type);
-                console.log(message.content, message.user_id, message.user_firstname, message.user_lastname, message.file_path, message.file_type)
+                appendMessageToChat(message.content, message.user_id, message.user_firstname, message.user_lastname, message.files);
+                //
+                console.log(message.content, message.user_id, message.user_firstname, message.user_lastname, message.files)
             });
             const lastMessageElement = chatDiv.lastElementChild;
             if (lastMessageElement) {
@@ -263,8 +262,8 @@ function subscribeToGroupChannel(groupId) {
     if (!groupChannels[groupId]) {
         groupChannels[groupId] = window.Echo.private(`group.${groupId}`)
             .listen('GroupChatMessageEvent', (e) => {
-                console.log("message contient " + e.message.content,e.message.id, e.message.firstname, e.message.lastname,e.message.file_path, e.message.file_type)
-                appendMessageToChat(e.message.content,e.message.id, e.message.firstname, e.message.lastname,e.message.file_path, e.message.file_type);
+                console.log("message contient " + e.message.content,e.message.id, e.message.firstname, e.message.lastname,e.message.files)
+                appendMessageToChat(e.message.content,e.message.id, e.message.firstname, e.message.lastname,e.message.files);
                 loadPreviousMessages(groupId);
             });
     }
@@ -279,7 +278,7 @@ function getUserInfo() {
             globalFirstname = response.data.firstname;
             globalLastname = response.data.lastname;
             globalUserId = response.data.id
-            console.log('User info loaded:', globalFirstname, globalLastname);
+            //console.log('User info loaded:', globalFirstname, globalLastname);
         })
         .catch(error => {
             console.error('Erreur lors de la récupération des informations de l\'utilisateur', error);
@@ -290,7 +289,6 @@ function getUserInfo() {
 function sendMessage() {
     const messageInput = document.querySelector('input[type="text"]');
     const messageContent = messageInput.value;
-
     const fileInput = document.getElementById('fileInput');
     const previewContainer = document.getElementById('previewContainer');
 
@@ -305,11 +303,12 @@ function sendMessage() {
     if (messageContent.trim()) {
         formData.append('message', messageContent);
     }
-    if (fileInput.files.length > 0) {
-        formData.append('file', fileInput.files[0]);
-    }
 
-
+    // Ajouter chaque fichier sélectionné à formData
+    Array.from(fileInput.files).forEach((file, index) => {
+        formData.append(`files[${index}]`, file);
+        console.log(file)
+    });
 
     axios.post(`/group-chat/${currentGroupId}/send`, formData, {
         headers: {
@@ -338,8 +337,10 @@ function sendMessage() {
 // Liez cette fonction au bouton d'envoi ou à l'événement 'submit' du formulaire de message.
 
 
-function appendMessageToChat(messageContent, authorID, authorFirstname, authorLastname,filePath, fileType) {
-    console.log(filePath, fileType)
+function appendMessageToChat(messageContent, authorID, authorFirstname, authorLastname,fileData) {
+
+    //console.log(fileData)
+
     const chatDiv = document.querySelector('.grid.grid-cols-12.gap-y-2');
     const messageElement = document.createElement('div');
 
@@ -381,24 +382,43 @@ function appendMessageToChat(messageContent, authorID, authorFirstname, authorLa
         flexDiv.appendChild(authorDiv);
     }
 
-    if (filePath) {
-        const fileElement = document.createElement('div');
-        fileElement.className = 'mt-2';
+    if (fileData && fileData.length > 0) {
+        fileData.forEach(file => {
+            const { file_path, file_type } = file; // Utilisez les clés correctes ici
+            const fileElement = document.createElement('div');
+            fileElement.className = 'mt-2';
 
-        if (fileType.startsWith('image/')) {
-            const img = document.createElement('img');
-            img.src = filePath;
-            img.className = 'max-w-full h-auto rounded-lg';
-            fileElement.appendChild(img);
-        } else if (fileType.startsWith('video/')) {
-            const video = document.createElement('video');
-            video.src = filePath;
-            video.controls = true;
-            video.className = 'max-w-full h-auto rounded-lg';
-            fileElement.appendChild(video);
-        }
+            // Assurez-vous que file_type est défini avant de continuer
+            if (file_type) {
+                if (file_type.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = file_path; // Utilisez file_path ici
+                    img.className = 'max-w-full h-auto rounded-lg';
+                    fileElement.appendChild(img);
+                } else if (file_type.startsWith('video/')) {
+                    const video = document.createElement('video');
+                    video.src = file_path; // Utilisez file_path ici
+                    video.controls = true;
+                    video.className = 'max-w-full h-auto rounded-lg';
+                    fileElement.appendChild(video);
+                } else if (file_type.startsWith('audio/')) {
+                    const audio = document.createElement('audio');
+                    audio.src = file_path; // Utilisez file_path ici
+                    audio.controls = true;
+                    fileElement.appendChild(audio);
+                } else {
+                    const text = document.createElement('p');
+                    text.textContent = 'Type de fichier non pris en charge';
+                    fileElement.appendChild(text);
+                }
+            } else {
+                const text = document.createElement('p');
+                text.textContent = 'Aucun type de fichier disponible';
+                fileElement.appendChild(text);
+            }
 
-        messageContentDiv.appendChild(fileElement);
+            messageContentDiv.appendChild(fileElement);
+        });
     }
 
     messageElement.appendChild(authorInfoDiv);
@@ -438,7 +458,7 @@ function startConversation(userId) {
 function createPrivateGroup(userOneId, userTwoId) {
     axios.get(`/api/user-details/${userTwoId}`).then(response => {
         const otherUser = response.data;
-        console.log(response.data);
+        //console.log(response.data);
 
         // Construisez le nom du groupe en utilisant le prénom et le nom de l'autre utilisateur.
         const groupName = `${otherUser.firstname} ${otherUser.lastname}`; // Ajouté le lastname
@@ -448,7 +468,7 @@ function createPrivateGroup(userOneId, userTwoId) {
             userIds: [userOneId, userTwoId]
         })
             .then(response => {
-                console.log('Conversation privée créée avec succès', response.data);
+                //('Conversation privée créée avec succès', response.data);
                 joinGroupChat(response.data.group.id, groupName);
                 loadUserConversation()
             })
@@ -464,7 +484,7 @@ function createPrivateGroup(userOneId, userTwoId) {
 function loadUserConversation() {
     axios.get('/api/user-groups?type=private')
         .then(response => {
-            console.log(response.data)
+            //console.log(response.data)
             const groups = response.data.groups;
             const conversationsContainer = document.querySelector('.flex.flex-col.divide-y.h-full.overflow-y-auto.-mx-4'); // Sélecteur de la div pour les conversations
 
@@ -473,8 +493,8 @@ function loadUserConversation() {
 
             groups.forEach(group => {
                 const otherMember = group.members.find(member => member.id !== globalUserId);
-                console.log(otherMember)
-                console.log(globalUserId)
+                //console.log(otherMember)
+                //console.log(globalUserId)
 
                 // Crée un nouvel élément pour chaque conversation
                 const conversationElement = document.createElement('div');
@@ -548,8 +568,8 @@ function triggerPushNotification(groupId, messageContent, globaluserId) {
 
     })
         .then(response => {
-            console.log('Notification triggered successfully');
-            console.log(response.data)
+            //console.log('Notification triggered successfully');
+           // console.log(response.data)
         })
         .catch(error => {
             console.error('Error triggering notification', error);

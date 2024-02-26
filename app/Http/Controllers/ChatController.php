@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\ChatMessageEvent;
 use App\Events\GroupChatMessageEvent;
+use App\Models\File;
 use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -36,53 +37,66 @@ class ChatController extends Controller
         $request->validate([
             'groupId' => 'required|integer',
             'message' => 'nullable|string',
-            'file' => 'nullable|file|max:1024000', // Limite de 10 MB pour les fichiers
+            'files' => 'nullable|array',
+            'files.*' => 'file|max:1024000', // Validation pour chaque fichier
         ]);
+
+        Log::info($request);
+
 
         $message = new Message();
         $message->group_id = $request->input('groupId');
         $message->user_id = auth()->id();
-        $message->content = $request->input('message'); // Enregistrez le message texte s'il est présent
+        $message->content = $request->input('message');
+        $message->save();
 
-        // Vérifiez si un fichier est attaché et traitez-le
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $filePath = $file->storeAs('data_message', $filename, 'public'); // Stockez le fichier
+        $filesData = []; // Initialisez la variable avant de l'utiliser
 
-            // Enregistrez les détails du fichier dans la base de données
-            $message->file_path = $filePath;
-            $message->file_type = $file->getClientMimeType();
-            $message->file_size = $file->getSize();
+        if ($request->hasFile('files')) {
+            Log::info('Nombre de fichiers reçus : ' . count($request->file('files')));
+
+            foreach ($request->file('files') as $file) {
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $filePath = $file->storeAs('data_message', $filename, 'public');
+
+                // Création d'un enregistrement dans la table des fichiers pour chaque fichier
+                $fileModel = new File();
+                $fileModel->message_id = $message->id; // Assurez-vous que votre modèle File a un champ message_id
+                $fileModel->file_path = $filePath;
+                $fileModel->file_type = $file->getClientMimeType();
+                $fileModel->file_size = $file->getSize();
+                $fileModel->save();
+
+                // Ajoutez les informations sur le fichier à $filesData
+                $filesData[] = [
+                    'filePath' => $filePath,
+                    'fileType' => $file->getClientMimeType(),
+                    'fileSize' => $file->getSize(),
+                ];
+            }
         }
 
-        $message->save(); // Sauvegardez le message dans la base de données
-
-        // Récupérez le nom complet de l'utilisateur pour l'afficher dans le chat
         $firstname = auth()->user()->firstname;
         $lastname = auth()->user()->lastname;
 
-        // Déclenchez l'événement de diffusion du message
+        // Passez $filesData à l'événement
         event(new GroupChatMessageEvent(
             $request->input('groupId'),
             $message,
             $firstname,
             $lastname,
-            $message->file_path ,
-            $message->file_type
+            $filesData
         ));
-        Log::info($message);
-        // Incluez les détails du fichier dans la réponse JSON
+
         return response()->json([
             'success' => true,
             'messageId' => $message->id,
             'messageContent' => $message->content,
-            'filePath' => $message->file_path ? asset('storage/' . $message->file_path) : null,
-            'fileType' => $message->file_type,
-            'fileSize' => $message->file_size,
+            'files' => $filesData, // Inclure les données des fichiers dans la réponse
         ]);
 
     }
+
 
 
 

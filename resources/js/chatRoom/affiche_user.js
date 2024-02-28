@@ -417,9 +417,32 @@ function appendMessageToChat(messageContent, authorID, authorFirstname, authorLa
                 fileElement.appendChild(text);
             }
 
+
             messageContentDiv.appendChild(fileElement);
         });
+
+        // Bouton de téléchargement pour tous les fichiers
+        const downloadAllBtn = document.createElement('button');
+        downloadAllBtn.textContent = 'Enregistrer ⬇️';
+        downloadAllBtn.classList.add('mt-2', 'text-sm', 'text-black', 'p-1', 'rounded');
+        downloadAllBtn.onclick = () => {
+            fileData.forEach((file) => {
+                if (file.file_type.startsWith('image/') || file.file_type.startsWith('video/')) {
+                    const link = document.createElement('a');
+                    link.href = file.file_path;
+                    link.download = ''; // Le navigateur utilisera le nom du fichier sur le serveur
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            });
+        };
+
+        messageContentDiv.appendChild(downloadAllBtn);
     }
+
+
+
 
     messageElement.appendChild(authorInfoDiv);
     messageElement.appendChild(flexDiv);

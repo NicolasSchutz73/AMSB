@@ -37,9 +37,10 @@ class ChatController extends Controller
         $request->validate([
             'groupId' => 'required|integer',
             'message' => 'nullable|string',
-            'files' => 'nullable|array',
+            'files' => 'required_without:message|array',
             'files.*' => 'file|max:1024000', // Validation pour chaque fichier
         ]);
+
 
         Log::info($request);
 
@@ -47,7 +48,7 @@ class ChatController extends Controller
         $message = new Message();
         $message->group_id = $request->input('groupId');
         $message->user_id = auth()->id();
-        $message->content = $request->input('message');
+        $message->content = $request->input('message', ''); // Utilisez une chaîne vide comme valeur par défaut
         $message->save();
 
         $filesData = []; // Initialisez la variable avant de l'utiliser

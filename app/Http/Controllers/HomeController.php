@@ -52,12 +52,13 @@ class HomeController extends Controller
         $firebaseToken = User::whereNotNull('device_token')->pluck('device_token')->all();
 
         $SERVER_API_KEY = 'AAAAoXM2Djo:APA91bG4FIc9ClN16o2rpZ6jByJPYXqXwlpBW_GeRcgiomMslDKkgG8MszzC8eI36-KKb9iQFzL567Bk29xA2ZfadgNTg5c8EPeKxF4E8dcOyLyYtND_3Hvl4Y8seQDrcocnmpzBZxml';
+        $notificationBody = $request->body ?: 'Image';
 
         $data = [
             "registration_ids" => $firebaseToken,
             "notification" => [
                 "title" => $request->title,
-                "body" => $request->body,
+                "body" => $notificationBody,
                 "content_available" => true,
                 "priority" => "high",
             ]

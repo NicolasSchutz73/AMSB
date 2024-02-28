@@ -561,19 +561,25 @@ function sendNotificationToSW(title, body, icon) {
 }
 
 function triggerPushNotification(groupId, messageContent, globaluserId) {
+    // Utilisez "Image" comme contenu par défaut si messageContent est vide
+    const notificationContent = messageContent || "Image";
+
+
+
     axios.post('/api/send-notification-group', {
         groupId: groupId,
-        message: messageContent,
-        id_sender : globaluserId
-
+        message: notificationContent, // Utilisez notificationContent ici
+        id_sender: globaluserId
     })
         .then(response => {
-            //console.log('Notification triggered successfully');
-           // console.log(response.data)
+            /*console.log(notificationContent);
+            console.log(response.data)*/
+
         })
         .catch(error => {
             console.error('Error triggering notification', error);
         });
+
 }
 
 

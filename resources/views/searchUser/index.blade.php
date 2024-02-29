@@ -28,7 +28,7 @@
                 </thead>
                 <tbody>
                 @forelse($users as $user)
-                    <tr class="bg-white border-b hover:bg-gray-50 user-item cursor-pointer" onclick="window.location='{{ route('users.show', $user->id) }}'">
+                    <tr class="bg-white border-b hover:bg-gray-50 user-item cursor-pointer" onclick="window.location='{{ route('searchUser.show', $user->id) }}'">
                         <td class="px-6 py-4 text-gray-500">{{ $loop->iteration }}</td>
                         <td class="px-6 py-4 text-gray-500">{{ $user->firstname }}</td>
                         <td class="px-6 py-4 text-gray-500">{{ $user->lastname }}</td>

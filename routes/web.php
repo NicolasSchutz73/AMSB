@@ -64,6 +64,7 @@ Route::middleware('auth')->group(function () {
 */
 
 Route::get('/search-user', [SearchUserController::class, 'index'])->name('searchUser.index');
+Route::get('/search-user', [SearchUserController::class, 'show'])->name('searchUser.show');
 
 
 /*
@@ -111,6 +112,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::resources([
     'roles' => RoleController::class, // Gestion des rôles
     'users' => UserController::class, // Gestion des utilisateurs
+    'searchUser' => SearchUserController::class, // Gestion des utilisateurs
     'chat' => ChatController::class, // Gestion de la messagerie
 ]);
 

@@ -95,14 +95,6 @@
             @endisset
         </div>
 
-        <div class="mb-4">
-            <label for="roles" class="text-gray-500 dark:text-gray-400 block text-md-end text-start"><strong>Rôles :</strong></label>
-            <div class="mt-1">
-                @forelse ($user->getRoleNames() as $role)
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">{{ $role }}</span>
-                @empty
-                @endforelse
-            </div>
-        </div>
+
     </div>
 </x-app-layout>

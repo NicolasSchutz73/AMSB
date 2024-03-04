@@ -54,3 +54,4 @@ class GroupChatMessageEvent implements ShouldBroadcast
         return new PrivateChannel('group.' . $this->groupId);
     }
 }
+

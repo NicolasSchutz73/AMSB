@@ -34,6 +34,9 @@ document.addEventListener('DOMContentLoaded', function() {
         loadUserConversation();
         startRefreshingConversations();
 
+
+
+
         messaging.onMessage(function(payload) {
             const noteTitle = payload.notification.title;
             const noteOptions = {
@@ -164,23 +167,29 @@ function createGroup() {
 
 
 function loadUserGroups() {
+
+
     axios.get('/api/user-groups?type=group')
         .then(response => {
             const groups = response.data.groups;
             const groupsContainer = document.querySelector('.flex.flex-col.-mx-4');
 
+            console.log(response.data.groups)
             // Nettoyage du conteneur des groupes
             groupsContainer.innerHTML = '';
+
 
             groups.forEach(group => {
                 // Création de l'élément de groupe
                 const groupElement = document.createElement('div');
                 groupElement.classList.add('flex', 'flex-row', 'items-center', 'p-4', 'relative');
+                groupElement.setAttribute('data-group-id', group.id); // Attribut de données unique pour chaque groupe
 
                 // Temps depuis la dernière activité
                 const timeElement = document.createElement('div');
                 timeElement.classList.add('absolute', 'text-xs', 'text-gray-500', 'right-0', 'top-0', 'mr-4', 'mt-3');
                 timeElement.textContent = group.lastMessageTime || 'Un moment';
+                timeElement.setAttribute('data-last-message-time', group.id);
 
                 // Icône du groupe
                 const iconElement = document.createElement('div');
@@ -196,6 +205,8 @@ function loadUserGroups() {
                 const lastMessageElement = document.createElement('div');
                 lastMessageElement.classList.add('text-xs', 'truncate', 'w-40');
                 lastMessageElement.textContent = group.lastMessageContent || 'Pas de messages';
+                lastMessageElement.setAttribute('data-last-message', group.id);
+
 
                 // Nombre de nouveaux messages
                 const newMessagesElement = document.createElement('div');
@@ -217,6 +228,9 @@ function loadUserGroups() {
 
                 // Ajout d'un écouteur d'événements pour le clic
                 groupElement.addEventListener('click', () => joinGroupChat(group.id, groupNameElement.textContent));
+
+                subscribeToAllGroupChannels(groups); // S'abonne à tous les groupes
+
 
                 // Ajout de l'élément de groupe au conteneur
                 groupsContainer.appendChild(groupElement);
@@ -249,6 +263,7 @@ function loadPreviousMessages(groupId) {
 
 
 function joinGroupChat(groupId, groupName) {
+
     if (currentGroupId && groupChannels[currentGroupId]) {
         window.Echo.leave(`group.${currentGroupId}`);
         delete groupChannels[currentGroupId];
@@ -277,7 +292,6 @@ function subscribeToGroupChannel(groupId) {
     if (!groupChannels[groupId]) {
         groupChannels[groupId] = window.Echo.private(`group.${groupId}`)
             .listen('GroupChatMessageEvent', (e) => {
-                console.log("message contient " + e.message.content,e.message.id, e.message.firstname, e.message.lastname,e.message.files)
                 appendMessageToChat(e.message.content,e.message.id, e.message.firstname, e.message.lastname,e.message.files);
                 loadPreviousMessages(groupId);
             });
@@ -535,11 +549,14 @@ function loadUserConversation() {
                 // Créer un nouvel élément pour chaque conversation
                 const conversationElement = document.createElement('div');
                 conversationElement.classList.add('flex', 'flex-row', 'items-center', 'p-4', 'relative');
+                conversationElement.setAttribute('data-conversation-id', group.id); // Attribut de données unique pour chaque conversation
+
 
                 // Temps depuis la dernière activité
                 const timeElement = document.createElement('div');
                 timeElement.classList.add('absolute', 'text-xs', 'text-gray-500', 'right-0', 'top-0', 'mr-4', 'mt-3');
                 timeElement.textContent = group.lastMessageTime || 'Un moment';
+                timeElement.setAttribute('data-last-message-time', group.id);
 
                 // Icône
                 const iconElement = document.createElement('div');
@@ -555,6 +572,7 @@ function loadUserConversation() {
                 const lastMessageElement = document.createElement('div');
                 lastMessageElement.classList.add('text-xs', 'truncate', 'w-40');
                 lastMessageElement.textContent = group.lastMessageContent || 'Pas de messages';
+                lastMessageElement.setAttribute('data-last-message', group.id);
 
                 // Nombre de nouveaux messages
                 const newMessagesElement = document.createElement('div');
@@ -577,24 +595,13 @@ function loadUserConversation() {
 
                 // Ajouter l'élément de conversation au conteneur
                 conversationsContainer.appendChild(conversationElement);
+
+                subscribeToAllGroupChannelsPrivate(groups)
             });
         })
         .catch(error => console.error('Erreur lors du chargement des groupes', error));
 }
 
-// Dans votre script JS inclus dans une vue Blade
-function sendNotificationToSW(title, body, icon) {
-    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage({
-            type: 'SHOW_NOTIFICATION',
-            title: title,
-            body: body,
-            icon: icon
-        });
-    } else {
-        console.log('Service Worker not registered or page not controlled by SW');
-    }
-}
 
 function triggerPushNotification(groupId, messageContent, globaluserId) {
     // Utilisez "Image" comme contenu par défaut si messageContent est vide
@@ -632,6 +639,63 @@ function startRefreshingConversations() {
 
 
 
+function subscribeToAllGroupChannels(groups) {
+    groups.forEach(group => {
+        if (!groupChannels[group.id]) {
+            groupChannels[group.id] = window.Echo.private(`group.${group.id}`)
+                .listen('GroupChatMessageEvent', (e) => {
+                    console.log(e.message);
+                    updateGroupPreview(group.id, e.message.content);
+                });
+        }
+    });
+}
+
+
+function updateGroupPreview(groupId, messageContent) {
+    // Sélectionner l'élément de dernier message en utilisant l'attribut de données
+    const lastMessageElement = document.querySelector(`[data-last-message="${groupId}"]`);
+    if (lastMessageElement) {
+        lastMessageElement.textContent = messageContent || 'Nouveau message';
+    }
+
+    // Mettre à jour le temps du dernier message de la même manière
+    const lastMessageTimeElement = document.querySelector(`[data-last-message-time="${groupId}"]`);
+    if (lastMessageTimeElement) {
+        lastMessageTimeElement.textContent = new Date().toLocaleTimeString(); // ou toute autre logique de formatage de date
+    }
+
+}
+
+function subscribeToAllGroupChannelsPrivate(groups) {
+    groups.forEach(group => {
+        if (!groupChannels[group.id]) {
+            groupChannels[group.id] = window.Echo.private(`group.${group.id}`)
+                .listen('GroupChatMessageEvent', (e) => {
+                    console.log(e.message);
+                    updateConversationPreview(group.id, e.message.content);
+                });
+        }
+    });
+}
+
+function updateConversationPreview(conversationId, messageContent, messageTime) {
+    // Sélectionner les éléments de la conversation en utilisant les attributs de données
+    const lastMessageElement = document.querySelector(`[data-conversation-id="${conversationId}"] [data-last-message]`);
+    if (lastMessageElement) {
+        lastMessageElement.textContent = messageContent || 'Nouveau message';
+    }
+
+    const lastMessageTimeElement = document.querySelector(`[data-conversation-id="${conversationId}"] [data-last-message-time]`);
+    if (lastMessageTimeElement) {
+        lastMessageTimeElement.textContent = messageTime || new Date().toLocaleTimeString(); // Utilisez votre logique de formatage de date
+    }
+
+    // Mettre à jour d'autres éléments si nécessaire
+}
+
+
+
 
 
 
@@ -647,3 +711,4 @@ function openModal() {
 function closeModal() {
     document.getElementById('userModal').classList.add('hidden');
 }
+

@@ -32,6 +32,19 @@ document.addEventListener('DOMContentLoaded', function() {
     getUserInfoAsync().then(() => {
         loadUserGroups();
         loadUserConversation();
+        startRefreshingConversations();
+
+        messaging.onMessage(function(payload) {
+            const noteTitle = payload.notification.title;
+            const noteOptions = {
+                body: payload.notification.body,
+                icon: payload.notification.icon,
+            };
+            console.log("new message")
+            loadUserGroups();
+            loadUserConversation();
+        });
+
     }).catch(error => {
         console.error('Erreur lors de la récupération des informations utilisateur', error);
     });
@@ -154,53 +167,55 @@ function loadUserGroups() {
     axios.get('/api/user-groups?type=group')
         .then(response => {
             const groups = response.data.groups;
-            const groupsContainer = document.querySelector('.flex.flex-col.-mx-4'); // Sélecteur de la div où afficher les groupes
+            const groupsContainer = document.querySelector('.flex.flex-col.-mx-4');
 
-            // Nettoie la liste actuelle des groupes
+            // Nettoyage du conteneur des groupes
             groupsContainer.innerHTML = '';
 
             groups.forEach(group => {
-                // Crée un nouvel élément pour chaque groupe
+                // Création de l'élément de groupe
                 const groupElement = document.createElement('div');
-                groupElement.classList.add('relative', 'flex', 'flex-row', 'items-center', 'p-4');
+                groupElement.classList.add('flex', 'flex-row', 'items-center', 'p-4', 'relative');
 
-                // Temps depuis la dernière activité du groupe (exemple statique '5 min')
+                // Temps depuis la dernière activité
                 const timeElement = document.createElement('div');
                 timeElement.classList.add('absolute', 'text-xs', 'text-gray-500', 'right-0', 'top-0', 'mr-4', 'mt-3');
-                timeElement.textContent = '5 min'; // Vous devrez remplacer cela par une valeur dynamique si disponible
+                timeElement.textContent = group.lastMessageTime || 'Un moment';
 
-                // Icône du groupe (exemple statique avec 'T')
+                // Icône du groupe
                 const iconElement = document.createElement('div');
                 iconElement.classList.add('flex', 'items-center', 'justify-center', 'h-10', 'w-10', 'rounded-full', 'bg-blue-500', 'text-blue-300', 'font-bold', 'flex-shrink-0');
-                iconElement.textContent = group.name.charAt(0)
+                iconElement.textContent = group.name.charAt(0);
 
-                // Nom et description du groupe
+                // Nom du groupe et dernier message
                 const groupInfoElement = document.createElement('div');
                 groupInfoElement.classList.add('flex', 'flex-col', 'flex-grow', 'ml-3');
                 const groupNameElement = document.createElement('div');
                 groupNameElement.classList.add('text-sm', 'font-medium');
                 groupNameElement.textContent = group.name;
-                const groupDescElement = document.createElement('div');
-                groupDescElement.classList.add('text-xs', 'truncate', 'w-40');
-/*
-                groupDescElement.textContent = group.description; // Remplacez par la description du groupe si disponible
-*/
+                const lastMessageElement = document.createElement('div');
+                lastMessageElement.classList.add('text-xs', 'truncate', 'w-40');
+                lastMessageElement.textContent = group.lastMessageContent || 'Pas de messages';
 
-                // Nombre de nouveaux messages (exemple statique '5')
+                // Nombre de nouveaux messages
                 const newMessagesElement = document.createElement('div');
                 newMessagesElement.classList.add('flex-shrink-0', 'ml-2', 'self-end', 'mb-1');
                 const messagesCountElement = document.createElement('span');
                 messagesCountElement.classList.add('flex', 'items-center', 'justify-center', 'h-5', 'w-5', 'bg-red-500', 'text-white', 'text-xs', 'rounded-full');
-                messagesCountElement.textContent = '5'; // Remplacez par le nombre réel de nouveaux messages si disponible
+                messagesCountElement.textContent = group.newMessagesCount || '';
 
                 // Assemblage des éléments
-                //newMessagesElement.appendChild(messagesCountElement);
                 groupInfoElement.appendChild(groupNameElement);
-                groupInfoElement.appendChild(groupDescElement);
-                //groupElement.appendChild(timeElement);
+                groupInfoElement.appendChild(lastMessageElement);
+                if (group.newMessagesCount > 0) {
+                    newMessagesElement.appendChild(messagesCountElement);
+                }
+                groupElement.appendChild(timeElement);
                 groupElement.appendChild(iconElement);
                 groupElement.appendChild(groupInfoElement);
                 groupElement.appendChild(newMessagesElement);
+
+                // Ajout d'un écouteur d'événements pour le clic
                 groupElement.addEventListener('click', () => joinGroupChat(group.id, groupNameElement.textContent));
 
                 // Ajout de l'élément de groupe au conteneur
@@ -213,7 +228,7 @@ function loadUserGroups() {
 function loadPreviousMessages(groupId) {
     axios.get(`/group-chat/${groupId}/messages`)
         .then(response => {
-           console.log(response.data)
+            //console.log(response.data)
             const messages = response.data.messages;
             const chatDiv = document.querySelector('.grid.grid-cols-12.gap-y-2');
             chatDiv.innerHTML = ''; // Efface les messages précédents avant de charger les nouveaux
@@ -222,7 +237,7 @@ function loadPreviousMessages(groupId) {
                 // Vérifiez que vous avez bien les propriétés user_firstname et user_lastname dans chaque message
                 appendMessageToChat(message.content, message.user_id, message.user_firstname, message.user_lastname, message.files);
                 //
-                console.log(message.content, message.user_id, message.user_firstname, message.user_lastname, message.files)
+                //console.log(message.content, message.user_id, message.user_firstname, message.user_lastname, message.files)
             });
             const lastMessageElement = chatDiv.lastElementChild;
             if (lastMessageElement) {
@@ -322,6 +337,7 @@ function sendMessage() {
 
             loadPreviousMessages(currentGroupId);
             triggerPushNotification(currentGroupId, messageContent, globalUserId);
+            loadUserConversation()
         })
         .catch(error => {
             console.error('Erreur d\'envoi', error);
@@ -507,48 +523,45 @@ function createPrivateGroup(userOneId, userTwoId) {
 function loadUserConversation() {
     axios.get('/api/user-groups?type=private')
         .then(response => {
-            //console.log(response.data)
             const groups = response.data.groups;
-            const conversationsContainer = document.querySelector('.flex.flex-col.divide-y.h-full.overflow-y-auto.-mx-4'); // Sélecteur de la div pour les conversations
+            const conversationsContainer = document.querySelector('.flex.flex-col.divide-y.h-full.overflow-y-auto.-mx-4');
 
-            // Nettoie la liste actuelle des conversations
+            // Nettoyer la liste actuelle des conversations
             conversationsContainer.innerHTML = '';
 
             groups.forEach(group => {
                 const otherMember = group.members.find(member => member.id !== globalUserId);
-                //console.log(otherMember)
-                //console.log(globalUserId)
 
-                // Crée un nouvel élément pour chaque conversation
+                // Créer un nouvel élément pour chaque conversation
                 const conversationElement = document.createElement('div');
                 conversationElement.classList.add('flex', 'flex-row', 'items-center', 'p-4', 'relative');
 
-                // Temps depuis la dernière activité (exemple statique '2 hours ago')
+                // Temps depuis la dernière activité
                 const timeElement = document.createElement('div');
                 timeElement.classList.add('absolute', 'text-xs', 'text-gray-500', 'right-0', 'top-0', 'mr-4', 'mt-3');
-                //timeElement.textContent = '2 hours ago'; // Remplacer par une valeur dynamique si disponible
+                timeElement.textContent = group.lastMessageTime || 'Un moment';
 
-                // Icône (exemple statique avec 'T')
+                // Icône
                 const iconElement = document.createElement('div');
                 iconElement.classList.add('flex', 'items-center', 'justify-center', 'h-10', 'w-10', 'rounded-full', 'bg-pink-500', 'text-pink-300', 'font-bold', 'flex-shrink-0');
-                iconElement.textContent = group.name.charAt(0); // Utilisez la première lettre du nom du groupe comme icône
+                iconElement.textContent = otherMember ? otherMember.firstname.charAt(0) : group.name.charAt(0);
 
                 // Nom et dernier message
                 const groupInfoElement = document.createElement('div');
                 groupInfoElement.classList.add('flex', 'flex-col', 'flex-grow', 'ml-3');
                 const groupNameElement = document.createElement('div');
                 groupNameElement.classList.add('text-sm', 'font-medium');
-                groupNameElement.textContent = otherMember ? `${otherMember.firstname} ${otherMember.lastname}` : 'Unknown';
+                groupNameElement.textContent = otherMember ? `${otherMember.firstname} ${otherMember.lastname}` : 'Groupe inconnu';
                 const lastMessageElement = document.createElement('div');
                 lastMessageElement.classList.add('text-xs', 'truncate', 'w-40');
-                //lastMessageElement.textContent = 'Good after noon! how can i help you?'; // Dernier message, remplacer par la donnée dynamique si disponible
+                lastMessageElement.textContent = group.lastMessageContent || 'Pas de messages';
 
-                // Nombre de nouveaux messages (exemple statique '3')
+                // Nombre de nouveaux messages
                 const newMessagesElement = document.createElement('div');
                 newMessagesElement.classList.add('flex-shrink-0', 'ml-2', 'self-end', 'mb-1');
                 const messagesCountElement = document.createElement('span');
                 messagesCountElement.classList.add('flex', 'items-center', 'justify-center', 'h-5', 'w-5', 'bg-red-500', 'text-white', 'text-xs', 'rounded-full');
-                messagesCountElement.textContent = '3'; // Remplacer par le nombre réel de nouveaux messages si disponible
+                messagesCountElement.textContent = group.newMessagesCount || ''; // À définir selon votre logique de comptage des nouveaux messages
 
                 // Assemblage des éléments
                 groupInfoElement.appendChild(groupNameElement);
@@ -587,6 +600,8 @@ function triggerPushNotification(groupId, messageContent, globaluserId) {
     // Utilisez "Image" comme contenu par défaut si messageContent est vide
     const notificationContent = messageContent || "Image";
 
+    //console.log("grouid " + groupId + " message " + messageContent + " globaluser " + globaluserId)
+
 
 
     axios.post('/api/send-notification-group', {
@@ -606,6 +621,16 @@ function triggerPushNotification(groupId, messageContent, globaluserId) {
 }
 
 
+function startRefreshingConversations() {
+    loadUserConversation(); // Chargez les conversations immédiatement lors du premier appel
+
+    // Définissez un intervalle pour relancer l'actualisation toutes les 1 minute (60000 millisecondes)
+    setInterval(() => {
+        loadUserGroups();
+        loadUserConversation();    }, 60000);
+}
+
+
 
 
 
@@ -622,8 +647,3 @@ function openModal() {
 function closeModal() {
     document.getElementById('userModal').classList.add('hidden');
 }
-
-
-
-
-

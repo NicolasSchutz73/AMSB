@@ -8,6 +8,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class HomeController extends Controller
 {
@@ -38,9 +39,13 @@ class HomeController extends Controller
 
     public function saveToken(Request $request)
     {
-        auth()->user()->update(['device_token'=>$request->token]);
-        return response()->json(['token saved successfully.']);
+        Log::debug('Save Token Request', $request->all());
+
+        auth()->user()->update(['device_token' => $request->token]);
+
+        return response()->json(['message' => 'Token saved successfully.']);
     }
+
 
     /**
      * Write code on Method
@@ -90,15 +95,15 @@ class HomeController extends Controller
 
         $responseData = json_decode($response, true);
 
-//        dd("Réponse FCM : " . $response);
+        dd("Réponse FCM : " . $response);
 
-/*        if (isset($responseData['success']) && $responseData['success'] > 0) {
+        if (isset($responseData['success']) && $responseData['success'] > 0) {
             // La notification a été envoyée avec succès
             dd("Notification envoyée avec succès");
         } else {
             // Gérer l'échec de l'envoi de la notification
             dd("Échec de l'envoi de la notification");
-        } */
+        }
 
         // Fermeture de la ressource cURL
         curl_close($ch);

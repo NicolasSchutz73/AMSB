@@ -20,6 +20,11 @@ class Group extends Model
         return $this->hasMany(Message::class);
     }
 
+    public function lastMessage()
+    {
+        return $this->hasOne(Message::class)->latest();
+    }
+
 
     protected $fillable = ['name', 'type'];
 

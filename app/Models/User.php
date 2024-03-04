@@ -29,6 +29,7 @@ class User extends Authenticatable
         'password',
         'profile_photo_path',
         'document_path',
+        'device_token', // Ajoutez cette ligne
     ];
 
     /**

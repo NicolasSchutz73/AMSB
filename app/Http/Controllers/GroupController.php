@@ -39,21 +39,20 @@ class GroupController extends Controller
         // Récupérez le type à partir de la requête, s'il est présent
         $type = $request->query('type');
 
-        // Préparez la requête de base pour les groupes
+        // Préparez la requête de base pour les groupes en incluant la relation lastMessage
         $groupsQuery = $user->groups()->with(['users' => function ($query) {
-            // Qualifiez 'id' avec le nom de la table 'users'
             $query->select('users.id', 'users.firstname', 'users.lastname');
-        }]);
+        }, 'lastMessage']);
 
         if ($type) {
             // Filtrer les groupes en fonction du type si le paramètre type est présent
             $groupsQuery->where('type', $type);
         }
 
-        // Récupérez les groupes avec les utilisateurs préchargés
+        // Récupérez les groupes avec les utilisateurs et le dernier message préchargés
         $groups = $groupsQuery->get();
 
-        // Transformez les groupes pour inclure les informations des membres
+        // Transformez les groupes pour inclure les informations des membres et le dernier message
         $groups->transform(function ($group) {
             $group->members = $group->users->map(function ($user) {
                 return [
@@ -62,13 +61,20 @@ class GroupController extends Controller
                     'lastname' => $user->lastname,
                 ];
             });
+            // Ajoutez le dernier message et son auteur au groupe
+            $lastMessage = $group->lastMessage;
+            $group->lastMessageContent = $lastMessage ? $lastMessage->content : null;
+            $group->lastMessageAuthor = $lastMessage && $lastMessage->user ? $lastMessage->user->firstname . ' ' . $lastMessage->user->lastname : 'Unknown';
+            $group->lastMessageTime = $lastMessage ? $lastMessage->created_at->diffForHumans() : null; // Utilisez diffForHumans() pour un formatage convivial
+
             unset($group->users); // Supprimez la relation users pour éviter la redondance
+            unset($group->lastMessage); // Supprimez la relation lastMessage pour éviter la redondance
+
             return $group;
         });
 
         return response()->json(['groups' => $groups]);
     }
-
 
 
     public function getGroupMembers($groupId)

@@ -30,4 +30,10 @@ class Team extends Model
         });
     }
 
+    public static function getAllCategories()
+    {
+        // Récupérer uniquement les noms des équipes (colonne 'name')
+        return self::pluck('name')->toArray();
+    }
+
 }

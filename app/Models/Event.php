@@ -22,4 +22,10 @@ class Event {
         $this->attendees = $attendees;
         $this->isRecurring = $isRecurring;
     }
+
+    public function getCategories(): array
+    {
+        // Retourner un tableau des catégories en séparant la description par des virgules
+        return explode(',', $this->description);
+    }
 }

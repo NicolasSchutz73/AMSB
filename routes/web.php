@@ -11,71 +11,36 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SearchUserController;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\TeamController;
+use App\Http\Controllers\CalendarController;
 
-/*
-|--------------------------------------------------------------------------
-| Routes d'accueil
-|--------------------------------------------------------------------------
-|
-| Ces routes sont destinées à l'affichage des pages principales de l'application.
-|
-*/
-
-// Page d'accueil
+// Routes d'accueil
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Tableau de bord - Accessible uniquement aux utilisateurs authentifiés et vérifiés
+// Tableau de bord
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// Calendrier - Accessible uniquement aux utilisateurs authentifiés et vérifiés
-Route::get('/calendar', function () {
-    return view('calendar');
-})->middleware(['auth', 'verified'])->name('calendar');
 
-// Recherche d'utilisateurs - Accessible uniquement aux utilisateurs authentifiés et vérifiés
+// Recherche d'utilisateurs
 Route::get('/search-user', function () {
     return view('searchUser.index');
 })->middleware(['auth', 'verified'])->name('searchUser.index');
 
-/*
-|--------------------------------------------------------------------------
-| Routes de gestion de profil
-|--------------------------------------------------------------------------
-|
-| Ces routes permettent à l'utilisateur de modifier et supprimer son profil.
-|
-*/
-
+// Routes de gestion de profil
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-/*
-|--------------------------------------------------------------------------
-| Routes de page user
-|--------------------------------------------------------------------------
-|
-|
-*/
 
+// Routes de page user
 Route::get('/search-user', [SearchUserController::class, 'index'])->name('searchUser.index');
-Route::get('/search-user', [SearchUserController::class, 'show'])->name('searchUser.show');
+Route::get('/user/{id}', [SearchUserController::class, 'show'])->name('user.show');
 
-
-/*
-|--------------------------------------------------------------------------
-| Routes de la messagerie et des groupes
-|--------------------------------------------------------------------------
-|
-| Ces routes sont utilisées pour la gestion des conversations, des groupes et de la messagerie.
-|
-*/
-
+// Routes de la messagerie et des groupes
 Route::middleware(['auth', 'verified'])->group(function () {
     // Salle de chat
     Route::get('/chat-room', [GroupController::class, 'chatRoom'])->name('chat-room');
@@ -100,97 +65,42 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/create-group', [GroupController::class, 'store']);
 });
 
-/*
-|--------------------------------------------------------------------------
-| Routes de gestion des rôles et utilisateurs
-|--------------------------------------------------------------------------
-|
-| Ces routes permettent la gestion des rôles et des utilisateurs de l'application.
-|
-*/
-
+// Routes de gestion des rôles et utilisateurs
 Route::resources([
-    'roles' => RoleController::class, // Gestion des rôles
-    'users' => UserController::class, // Gestion des utilisateurs
-    'searchUser' => SearchUserController::class, // Gestion des utilisateurs
-    'chat' => ChatController::class, // Gestion de la messagerie
+    'roles' => RoleController::class,
+    'users' => UserController::class,
+    'searchUser' => SearchUserController::class,
+    'chat' => ChatController::class,
 ]);
 
-/*
-|--------------------------------------------------------------------------
-| Routes de gestion des équipes
-|--------------------------------------------------------------------------
-|
-| Ces routes permettent la gestion des équipes
-| Laravel générera automatiquement les routes nécessaires pour le CRUD des équipes.
-| GET /teams : Affiche la liste des équipes (index dans le contrôleur).
-| GET /teams/create : Affiche le formulaire de création d'équipe (create dans le contrôleur).
-| POST /teams : Traite la création d'une nouvelle équipe (store dans le contrôleur).
-| GET /teams/{team} : Affiche les détails d'une équipe spécifique (show dans le contrôleur).
-| GET /teams/{team}/edit : Affiche le formulaire de modification d'équipe (edit dans le contrôleur).
-| PUT/PATCH /teams/{team} : Traite la modification d'une équipe (update dans le contrôleur).
-| DELETE /teams/{team} : Supprime une équipe (destroy dans le contrôleur).
-*/
-
+// Routes de gestion des équipes
 Route::resource('teams', TeamController::class);
 
-/*
-|--------------------------------------------------------------------------
-| Routes de l'équipe d'un utilisateur
-|--------------------------------------------------------------------------
-| Cette route est utilisées pour qu'un utilisateur puisse voir son équipe.
-|
-*/
-
+// Routes de l'équipe d'un utilisateur
 Route::middleware(['auth'])->group(function () {
     Route::get('/my-teams', [TeamController::class, 'showUserTeams'])->name('my.teams');
 });
 
-
-/*
-|--------------------------------------------------------------------------
-    | Routes des notifications
-|--------------------------------------------------------------------------
-|
-| Ces routes sont utilisées pour des fonctionnalités de notifications.
-|
-*/
-
+// Routes des notifications
 Route::get('/notification', function () {
     return view('notification');
 })->middleware(['auth', 'verified'])->name('notification');
 
-Route::post('/save-token', [App\Http\Controllers\HomeController::class, 'saveToken'])->name('save-token');
-Route::post('/send-notification', [App\Http\Controllers\HomeController::class, 'sendNotification'])->name('send.notification');
+Route::post('/save-token', [HomeController::class, 'saveToken'])->name('save-token');
+Route::post('/send-notification', [HomeController::class, 'sendNotification'])->name('send.notification');
 
-/*
-|--------------------------------------------------------------------------
-| Routes supplémentaires et API
-|--------------------------------------------------------------------------
-|
-| Ces routes sont utilisées pour des fonctionnalités supplémentaires et l'accès API.
-|
-*/
-
-// Accès à l'information de l'utilisateur
+// Routes supplémentaires et API
 Route::get('/userinfo', [SearchUserController::class, 'getUserInfo'])->middleware('auth');
 
-// Endpoint API pour lister les utilisateurs - Utiliser dans api.php pour une réponse JSON
 Route::get('/api/users', [SearchUserController::class, 'apiIndex'])->middleware('auth');
 Route::get('/usersjson', [SearchUserController::class, 'apiIndex']); // À déplacer dans api.php pour une réponse JSON
 
-
 Route::get('/files/{filename}', 'FileController@show');
 
-/*
-|--------------------------------------------------------------------------
-| Authentification
-|--------------------------------------------------------------------------
-|
-| Inclusion des routes d'authentification fournies par Laravel Breeze.
-|
-*/
+Route::get('/calendar', [CalendarController::class, 'show'])->name('calendar');
 
+
+// Authentification
 Route::get('storage/profile-photos/{filename}', function ($filename) {
     $path = '/ASMB/' . $filename;
 

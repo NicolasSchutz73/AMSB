@@ -37,7 +37,6 @@ class EventsController extends Controller
         // Formater les événements
         $formattedEvents = [];
         foreach ($events as $event) {
-
             // Récupérer l'identifiant de l'événement
             $eventId = $event->getId();
 
@@ -65,12 +64,16 @@ class EventsController extends Controller
         // Créer des objets Event à partir des données formatées
         $eventObjects = [];
         foreach ($formattedEvents as $eventData) {
+            // Appeler la méthode getCategories sur chaque objet Event
+            $categories = explode(',', $eventData['description']);
+
+            // Créer un nouvel objet Event en utilisant les données formatées et les catégories extraites
             $event = new Event(
                 $eventData['id'],
                 $eventData['title'],
                 $eventData['start'],
                 $eventData['end'],
-                $eventData['description'],
+                $categories, // Utilisez les catégories extraites ici
                 $eventData['location'],
                 $eventData['attendees'],
                 $eventData['isRecurring']

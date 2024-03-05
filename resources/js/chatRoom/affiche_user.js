@@ -346,7 +346,7 @@ function appendMessageToChat(messageContent, authorID, authorFirstname, authorLa
     const initials = `${authorFirstname ? authorFirstname.charAt(0) : ''}${authorLastname ? authorLastname.charAt(0) : ''}`;
     const authorDiv = document.createElement('div');
     const authorLink = document.createElement('a');
-    authorLink.href = '/users/' + String(authorID);
+    authorLink.href = '/usershow/' + String(authorID);
     authorDiv.appendChild(authorLink);
     authorDiv.classList.add('flex', 'items-center', 'justify-center', 'h-10', 'w-10', 'rounded-full', 'text-white', 'font-bold');
     authorDiv.style.backgroundColor = isCurrentUserMessage ? '#4F46E5' : '#CBD5E1';

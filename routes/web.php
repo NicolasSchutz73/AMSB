@@ -8,6 +8,7 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserMessController;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\TeamController;
 
@@ -34,6 +35,10 @@ Route::get('/dashboard', function () {
 Route::get('/calendar', function () {
     return view('calendar');
 })->middleware(['auth', 'verified'])->name('calendar');
+
+Route::get('/usershow', function () {
+    return view('usersMess.inex');
+})->middleware(['auth', 'verified'])->name('usersMess.index');
 
 /*
 |--------------------------------------------------------------------------
@@ -75,6 +80,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Utilisateurs dans les groupes
     Route::get('/user-groups', [GroupController::class, 'getUserGroups'])->name('user-groups');
 
+    Route::get('/usershow', [UserMessController::class, 'index'])->name('userMess.index');
+    Route::get('/usershow', [UserMessController::class, 'show'])->name('userMess.show');
+
     // Vérification de groupe privé entre deux utilisateurs
     Route::get('/check-group/{userOneId}/{userTwoId}', [GroupController::class, 'checkPrivateGroup']);
 
@@ -95,6 +103,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::resources([
     'roles' => RoleController::class, // Gestion des rôles
     'users' => UserController::class, // Gestion des utilisateurs
+    'usershow' => UserMessController::class, // Gestion des utilisateurs par les mess
     'chat' => ChatController::class, // Gestion de la messagerie
 ]);
 
@@ -155,11 +164,11 @@ Route::post('/send-notification', [App\Http\Controllers\HomeController::class, '
 */
 
 // Accès à l'information de l'utilisateur
-Route::get('/userinfo', [UserController::class, 'getUserInfo'])->middleware('auth');
+Route::get('/userinfo', [UserMessController::class, 'getUserInfo'])->middleware('auth');
 
 // Endpoint API pour lister les utilisateurs - Utiliser dans api.php pour une réponse JSON
-Route::get('/api/users', [UserController::class, 'apiIndex'])->middleware('auth');
-Route::get('/usersjson', [UserController::class, 'apiIndex']); // À déplacer dans api.php pour une réponse JSON
+Route::get('/api/users', [UserMessController::class, 'apiIndex'])->middleware('auth');
+Route::get('/usersjson', [UserMessController::class, 'apiIndex']); // À déplacer dans api.php pour une réponse JSON
 
 /*
 |--------------------------------------------------------------------------

@@ -7,7 +7,7 @@
                 Information de l'utilisateur
             </label>
             <div>
-                <a href="{{ route('users.index') }}" class="bg-blue-500 text-white py-1 px-3 rounded text-sm">&larr; Retour</a>
+                <a href="{{ route('chat-room-users') }}" class="bg-blue-500 text-white py-1 px-3 rounded text-sm">&larr; Retour</a>
             </div>
         </div>
     </x-slot>
@@ -15,9 +15,8 @@
     <div class="p-6">
         <div class="mb-4">
             @php
-                var_dump($user);
-                    $imageUrl = "http://mcida.eu/AMSB/profile/" . $user->id . ".jpg";
-                    $headers = get_headers($imageUrl);
+                $imageUrl = "http://mcida.eu/AMSB/profile/" . $user->id . ".jpg";
+                $headers = get_headers($imageUrl);
             @endphp
 
             @if (strpos($headers[0], '200') !== false)

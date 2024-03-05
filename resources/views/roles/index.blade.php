@@ -1,8 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-white leading-tight">
-            Gérer les rôles
-        </h2>
+        <x-crud-header title="Gérer les rôles" subtitle="Voici la liste des rôles disponible."></x-crud-header>
     </x-slot>
     <div class="p-6">
         @can('create-role')

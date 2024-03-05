@@ -23,23 +23,27 @@
                         </x-nav-link>
                     </div>
 
-                @canany(['Admin', 'Super Admin'])
+                @canany(['Admin', 'Super Admin', 'coach'])
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                         <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
                             {{ __('Utilisateur') }}
                         </x-nav-link>
                     </div>
+                @endcanany
 
+                @canany(['Admin', 'Super Admin'])
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                        <x-nav-link :href="route('roles.index')" :active="request()->routeIs('roles.index')">
-                            {{ __('Rôles') }}
-                        </x-nav-link>
+                            <x-nav-link :href="route('roles.index')" :active="request()->routeIs('roles.index')">
+                                {{ __('Rôles') }}
+                            </x-nav-link>
                     </div>
+                @endcanany
 
+                @canany(['Admin', 'Super Admin', 'coach'])
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                        <x-nav-link :href="route('teams.index')" :active="request()->routeIs('teams.index')">
-                            {{ __('Équipes') }}
-                        </x-nav-link>
+                            <x-nav-link :href="route('teams.index')" :active="request()->routeIs('teams.index')">
+                                {{ __('Équipes') }}
+                            </x-nav-link>
                     </div>
                 @endcanany
 

@@ -161,6 +161,9 @@ Route::get('/userinfo', [UserController::class, 'getUserInfo'])->middleware('aut
 Route::get('/api/users', [UserController::class, 'apiIndex'])->middleware('auth');
 Route::get('/usersjson', [UserController::class, 'apiIndex']); // À déplacer dans api.php pour une réponse JSON
 
+
+Route::get('/files/{filename}', 'FileController@show');
+
 /*
 |--------------------------------------------------------------------------
 | Authentification

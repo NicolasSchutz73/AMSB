@@ -7,6 +7,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Group;
+use Illuminate\Support\Facades\Log;
 
 class GroupChatMessageEvent implements ShouldBroadcast
 {
@@ -16,6 +17,8 @@ class GroupChatMessageEvent implements ShouldBroadcast
     public $message;
     public $firstname;
     public $lastname;
+    public $filePath; // Ajouté
+    public $fileType; // Ajouté
 
 
     public function __construct($groupId, $message, $firstname,$lastname)
@@ -23,18 +26,26 @@ class GroupChatMessageEvent implements ShouldBroadcast
         $this->groupId = $groupId;
         $this->message = $message;
         $this->firstname = $firstname;
-        $this->lastname = $lastname;  }
+        $this->lastname = $lastname;
+
+    }
 
     public function broadcastWith()
     {
+        $files = $this->message->files()->get(['file_path', 'file_type', 'file_size'])->toArray();
+        LOG::info("message files :", $files);
         return [
             'message' => [
                 'id' => $this->message->id,
                 'content' => $this->message->content,
                 'firstname' => $this->firstname,
-                'lastname' => $this->lastname,],
+                'lastname' => $this->lastname,
+                'files' => $files, // Inclure les fichiers associés
 
+            ]
         ];
+
+
     }
 
 
@@ -43,3 +54,4 @@ class GroupChatMessageEvent implements ShouldBroadcast
         return new PrivateChannel('group.' . $this->groupId);
     }
 }
+

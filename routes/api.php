@@ -1,5 +1,8 @@
 <?php
 
+
+use App\Models\Event;
+use App\Http\Controllers\EventsController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -39,3 +42,9 @@ Route::post('/send-notification', [App\Http\Controllers\HomeController::class, '
 
 
 Route::post('/send-notification-group', [GroupController::class, 'sendNotificationGroup'])->middleware('auth:sanctum');
+
+
+
+Route::get('events', [EventsController::class, 'getEvents'])->name('events');
+
+

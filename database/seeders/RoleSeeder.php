@@ -37,5 +37,7 @@ class RoleSeeder extends Seeder
 
         $parents = Role::create(['name' => 'parents']);
 
+        $joueur = Role::create(['name' => 'joueur']);
+
     }
 }

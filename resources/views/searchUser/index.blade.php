@@ -1,8 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-white leading-tight">
-            Gérer les utilisateurs
-        </h2>
+        <x-crud-header title="Rechercher les utilisateurs" subtitle="Voici la liste des utilisateurs disponible."></x-crud-header>
     </x-slot>
     <div class="p-6">
 

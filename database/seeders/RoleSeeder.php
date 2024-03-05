@@ -35,5 +35,7 @@ class RoleSeeder extends Seeder
             'delete-user'
         ]);
 
+        $parents = Role::create(['name' => 'parents']);
+
     }
 }

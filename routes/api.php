@@ -4,7 +4,7 @@
 use App\Models\Event;
 use App\Http\Controllers\EventsController;
 use App\Http\Controllers\GroupController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\SearchUserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +30,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+
 Route::middleware('auth:sanctum')->get('/user-groups', [GroupController::class, 'getUserGroups']);
 
 // web.php ou api.php
@@ -37,7 +38,7 @@ Route::middleware('auth:sanctum')->get('/user-groups', [GroupController::class, 
 Route::get('/check-group/{userOneId}/{userTwoId}', [GroupController::class, 'checkPrivateGroup']);
 
 
-Route::middleware('auth:sanctum')->get('/user-details/{id}', [UserController::class, 'getUserDetailsById']);
+Route::middleware('auth:sanctum')->get('/user-details/{id}', [SearchUserController::class, 'getUserDetailsById']);
 Route::post('/send-notification', [App\Http\Controllers\HomeController::class, 'sendNotification'])->name('send.notification');
 
 

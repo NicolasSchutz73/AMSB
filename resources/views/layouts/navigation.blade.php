@@ -60,6 +60,12 @@
                         {{ __('Mon équipe') }}
                     </x-nav-link>
                 </div>
+
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('searchUser.index')" :active="request()->routeIs('searchUser.index')">
+                        {{ __('Rechercher') }}
+                    </x-nav-link>
+                </div>
             </div>
 
             <!-- Settings Dropdown -->

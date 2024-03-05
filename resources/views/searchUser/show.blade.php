@@ -7,7 +7,7 @@
                 Information de l'utilisateur
             </label>
             <div>
-                <a href="{{ route('users.index') }}" class="bg-blue-500 text-white py-1 px-3 rounded text-sm">&larr; Retour</a>
+                <a href="{{ route('searchUser.index') }}" class="bg-blue-500 text-white py-1 px-3 rounded text-sm">&larr; Retour</a>
             </div>
         </div>
     </x-slot>

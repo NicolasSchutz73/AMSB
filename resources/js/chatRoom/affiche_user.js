@@ -6,12 +6,18 @@ let groupChannels = {};
 let globalFirstname = '';
 let globalLastname = '';
 let globalUserId = '';
+
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('btn_affiche_user').addEventListener('click', openModal);
     document.getElementById('btn_fermer_modal_').addEventListener('click', closeModal);
     document.getElementById('nouveau-groupe-btn').addEventListener('click', toggleGroupCreationMode);
     document.getElementById('nextButton').addEventListener('click', createGroup);
 
+    showConversationList()
+
+
+    const backButton = document.getElementById('backButton'); // L'identifiant du bouton de retour
+    backButton.addEventListener('click', showConversationList);
 
     const sendButton = document.getElementById('sendButton');
     const messageInput = document.getElementById('messageInput');
@@ -29,11 +35,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
 
+
+
+
     getUserInfoAsync().then(() => {
         loadUserGroups();
         loadUserConversation();
         startRefreshingConversations();
         loadUnreadMessagesCount()
+
 
 
 
@@ -70,6 +80,21 @@ function getUserInfoAsync() {
     });
 }
 
+function showConversationList() {
+    const conversationList = document.querySelector('.conversation-list');
+    const conversation = document.querySelector('.conversation');
+    conversationList.classList.remove('hidden');
+    conversation.classList.add('hidden');
+}
+
+// Cette fonction montre une conversation spécifique et cache la liste des conversations
+function showConversation() {
+    console.log("show")
+    const conversationList = document.querySelector('.conversation-list');
+    const conversation = document.querySelector('.conversation');
+    conversationList.classList.add('hidden');
+    conversation.classList.remove('hidden');
+}
 
 
 
@@ -292,6 +317,8 @@ function joinGroupChat(groupId, groupName) {
 
     // Abonne au canal du groupe
     subscribeToGroupChannel(groupId);
+
+    showConversation()
 }
 function subscribeToGroupChannel(groupId) {
     if (!groupChannels[groupId]) {

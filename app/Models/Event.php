@@ -26,60 +26,40 @@ class Event {
         $this->isRecurring = $isRecurring;
     }
 
-
-    public static function whereCategoryIn($category): array
+    public static function getEvents(Request $request): array
     {
-        // Récupérer tous les événements en utilisant la méthode getEvents du contrôleur EventsController
-        $events = static::getEvents(new Request());
+        // Appel à la méthode getEvents de EventsController pour récupérer les événements depuis Google Calendar
+        $eventsController = new EventsController();
+        $response = $eventsController->getEvents($request);
 
-        // Filtrer les événements qui contiennent la catégorie spécifiée
-        $filteredEvents = [];
-        foreach ($events as $event) {
-            // Vérifier si la catégorie spécifiée est présente dans les catégories de l'événement
-            if (in_array($category, $event->getCategories())) {
-                $filteredEvents[] = $event;
+        // Récupérer les événements depuis la réponse JSON
+        $events = $response->getOriginalContent()['events'];
+
+        // Convertir la description en chaîne de caractères si elle n'est pas déjà une chaîne
+        foreach ($events as &$event) { // Utilisation de référence pour modifier les événements directement dans le tableau
+            if (!is_string($event->description)) {
+                $event->description = json_encode($event->description);
             }
         }
 
-        return $filteredEvents;
+        return $events;
     }
 
-    public function getCategories(): array
+    public static function getCategories(Request $request): array
     {
-        // Vérifier si la description est définie et est une chaîne de caractères
-        if (isset($this->description) && is_string($this->description)) {
-            // Retourner un tableau des catégories en séparant la description par des virgules
-            return explode(',', $this->description);
-        } else {
-            // Retourner un tableau vide si la description n'est pas définie ou n'est pas une chaîne de caractères
-            return [];
-        }
+        // Appel à la méthode getCategories de EventsController pour récupérer les catégories des événements
+        $eventsController = new EventsController();
+        $response = $eventsController->getCategories($request);
+
+        // Récupérer les catégories depuis la réponse JSON
+        $categories = $response->getOriginalContent()['categories'];
+
+        return $categories;
     }
-
-
-    public static function getEvents(Request $request): array
-    {
-    // Appel à la méthode getEvents de EventsController pour récupérer les événements depuis Google Calendar
-    $eventsController = new EventsController();
-    $response = $eventsController->getEvents($request);
-
-    // Récupérer les événements depuis la réponse JSON
-    $events = $response->getOriginalContent()['events'];
-
-    // Convertir la description en chaîne de caractères si elle n'est pas déjà une chaîne
-    foreach ($events as $event) {
-        if (!is_string($event['description'])) {
-            $event['description'] = json_encode($event['description']);
-        }
-    }
-
-    return $events;
-    }
-
 
     public static function getCategoriesById(Request $request, $eventId): array
     {
-        // Appel à la méthode getCategoriesById de EventsController pour récupérer les catégories de l'événement spécifié par son ID
+        // Appel à la méthode getCategoriesById de EventsController pour récupérer les catégories d'un événement spécifique
         $eventsController = new EventsController();
         $response = $eventsController->getCategoriesById($request, $eventId);
 

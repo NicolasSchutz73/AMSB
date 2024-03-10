@@ -64,8 +64,9 @@ class User extends Authenticatable
 
     public function groups()
     {
-        return $this->belongsToMany(Group::class);
+        return $this->belongsToMany(Group::class)->withPivot('last_visited_at');
     }
+
 
     /**
      * Vérifie si l'utilisateur est membre d'un groupe spécifique.

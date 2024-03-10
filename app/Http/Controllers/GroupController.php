@@ -53,7 +53,8 @@ class GroupController extends Controller
         $groups = $groupsQuery->get();
 
         // Transformez les groupes pour inclure les informations des membres et le dernier message
-        $groups->transform(function ($group) {
+        $groups->transform(function ($group) use ($user) {
+            $lastVisitedAt = $group->pivot->where('user_id', $user->id)->first()->last_visited_at ?? null;
             $group->members = $group->users->map(function ($user) {
                 return [
                     'id' => $user->id,
@@ -65,7 +66,10 @@ class GroupController extends Controller
             $lastMessage = $group->lastMessage;
             $group->lastMessageContent = $lastMessage ? $lastMessage->content : null;
             $group->lastMessageAuthor = $lastMessage && $lastMessage->user ? $lastMessage->user->firstname . ' ' . $lastMessage->user->lastname : 'Unknown';
-            $group->lastMessageTime = $lastMessage ? $lastMessage->created_at->diffForHumans() : null; // Utilisez diffForHumans() pour un formatage convivial
+            $group->lastMessageTime = $lastMessage ? $lastMessage->created_at->diffForHumans() : null;
+
+            $group->lastVisitedAt = $lastVisitedAt; // Utilisez le nom de colonne correct ici
+            $group->unreadMessagesCount = $group->messages->where('created_at', '>', $lastVisitedAt)->count();
 
             unset($group->users); // Supprimez la relation users pour éviter la redondance
             unset($group->lastMessage); // Supprimez la relation lastMessage pour éviter la redondance
@@ -131,6 +135,54 @@ class GroupController extends Controller
 
         return response()->json(['messages' => $transformedMessages]);
     }
+
+    public function showGroupMessages($groupId)
+    {
+        $user = auth()->user();
+        $group = Group::findOrFail($groupId);
+
+        // Mettre à jour l'horodatage de dernière visite
+        $user->groups()->updateExistingPivot($groupId, ['last_visited_at' => now()]);
+
+        // Récupérer et retourner les messages ou autre logique...
+    }
+
+
+    public function updateLastVisitedAt($groupId)
+    {
+        $user = auth()->user();
+
+        // Vérifier si l'utilisateur est dans le groupe
+        $groupUserPivot = $user->groups()->where('group_id', $groupId)->first();
+
+        if ($groupUserPivot) {
+            // Mettre à jour uniquement l'horodatage de 'last_visited_at' pour cet utilisateur
+            $user->groups()->updateExistingPivot($groupId, ['last_visited_at' => now()]);
+
+            Log::info("Last visited updated for user {$user->id} in group {$groupId}");
+
+            return response()->json(['message' => 'Last visited updated successfully']);
+        } else {
+            return response()->json(['error' => 'User not in group'], 403);
+        }
+    }
+
+
+    public function resetUnreadMessages($groupId)
+    {
+        $user = auth()->user();
+        $group = $user->groups()->find($groupId);
+
+        if (!$group) {
+            return response()->json(['error' => 'Group not found'], 404);
+        }
+
+        // Mettre à jour l'horodatage de dernière visite
+        $user->groups()->updateExistingPivot($groupId, ['last_visited_at' => now()]);
+
+        return response()->json(['message' => 'Unread messages count reset successfully']);
+    }
+
 
 
 

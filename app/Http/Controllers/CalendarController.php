@@ -32,4 +32,12 @@ class CalendarController extends Controller
             'categories' => $categories,
         ]);
     }
+
+    public function getEventsByCategory(Request $request)
+    {
+        $category = $request->input('category');
+        $events = Event::getEventsByCategory($request, $category);
+        return response()->json(['events' => $events]);
+    }
+
 }

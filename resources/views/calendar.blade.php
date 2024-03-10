@@ -8,12 +8,20 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Menu déroulant des catégories -->
-            <select id="category-filter">
+            <select id="category-filter" onchange="changeCategory()">
                 <option value="">Toutes les catégories</option>
-                @foreach($categories as $category)
+                @foreach($categories ?? [] as $category)
                     <option value="{{ $category }}">{{ $category }}</option>
                 @endforeach
             </select>
+
+            <script>
+                function changeCategory() {
+                    var category = document.getElementById('category-filter').value;
+                    window.location.href = '/calendar?category=' + encodeURIComponent(category);
+                }
+            </script>
+
             <br><br>
 
             <!-- Calendrier -->

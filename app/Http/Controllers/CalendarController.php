@@ -2,17 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Event;
 use App\Models\Team;
 use Illuminate\Http\Request;
 
 class CalendarController extends Controller
 {
-    public function show()
+    public function show(Request $request)
     {
-        // Récupérer toutes les catégories
-        $categories = Team::getAllCategories();
+        // Récupérer la catégorie sélectionnée depuis la requête
+        $category = $request->input('category');
 
-        // Retourner la vue du calendrier avec les catégories
-        return view('calendar', ['categories' => $categories]);
+        // Si aucune catégorie n'est sélectionnée, afficher tous les événements
+        if (!$category) {
+            $events = Event::getEvents($request); // Ajouter get() pour récupérer les résultats
+        } else {
+            // Si une catégorie est sélectionnée, filtrer les événements correspondants à cette catégorie
+            $events = Event::whereCategoryIn($category); // Ajouter get() pour récupérer les résultats
+        }
+
+        // Récupérer les catégories depuis EventsController
+        $ekip = new Team();
+        $categories = $ekip->getAllCategories();
+
+        // Passer les événements filtrés et les catégories à la vue
+        return view('calendar', [
+            'events' => $events,
+            'selectedCategory' => $category,
+            'categories' => $categories,
+        ]);
     }
 }

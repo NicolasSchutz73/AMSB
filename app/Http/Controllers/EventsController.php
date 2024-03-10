@@ -10,6 +10,9 @@ use App\Models\Event; // Importez la classe Event
 
 class EventsController extends Controller
 {
+
+
+
     public function getEvents(Request $request): JsonResponse
     {
         // Configuration de l'accès à l'API Google Calendar
@@ -18,7 +21,7 @@ class EventsController extends Controller
         $client->setScopes(Google_Service_Calendar::CALENDAR_READONLY);
 
         // Authentification avec une clé d'API
-        $client->setDeveloperKey('AIzaSyCxxKnWhC3mcOalpB-FCWJoA9Kg9jSCnPs');
+        $client->setDeveloperKey('AIzaSyCxxKnWhC3mcOalpB-FCWJoA9Kg9jSCnPs'); // Remplacez YOUR_API_KEY_HERE par votre clé d'API Google Calendar
 
         // Création du service Google Calendar
         $service = new Google_Service_Calendar($client);
@@ -26,7 +29,6 @@ class EventsController extends Controller
         // Récupération des événements
         $calendarId = 'charriersim@gmail.com';
         $optParams = [
-            'maxResults' => 10,
             'orderBy' => 'startTime',
             'singleEvents' => true,
             'timeMin' => date('c'),
@@ -86,4 +88,75 @@ class EventsController extends Controller
             'events' => $eventObjects, // Retournez les objets Event au lieu des données formatées
         ]);
     }
+
+    public function getCategories(Request $request): JsonResponse
+    {
+        // Configuration de l'accès à l'API Google Calendar
+        $client = new Google_Client();
+        $client->setAuthConfig(config_path('google/credentials.json'));
+        $client->setScopes(Google_Service_Calendar::CALENDAR_READONLY);
+
+        // Authentification avec une clé d'API
+        $client->setDeveloperKey('AIzaSyCxxKnWhC3mcOalpB-FCWJoA9Kg9jSCnPs');
+
+        // Création du service Google Calendar
+        $service = new Google_Service_Calendar($client);
+
+        // Récupération des événements
+        $calendarId = 'charriersim@gmail.com';
+        $optParams = [
+            'orderBy' => 'startTime',
+            'singleEvents' => true,
+            'timeMin' => date('c'),
+        ];
+        $results = $service->events->listEvents($calendarId, $optParams);
+        $events = $results->getItems();
+
+        // Créer un tableau associatif pour stocker les catégories par ID d'événement
+        $categoriesById = [];
+
+        // Parcourir chaque événement et extraire les catégories de sa description
+        foreach ($events as $event) {
+            // Récupérer l'identifiant de l'événement
+            $eventId = $event->getId();
+
+            // Extraire les catégories de la description de l'événement
+            $categories = explode(',', $event->getDescription());
+
+            // Stocker les catégories dans le tableau associatif en les liant à l'identifiant de l'événement
+            $categoriesById[$eventId] = $categories;
+        }
+
+        // Retourner les catégories par ID d'événement au format JSON
+        return response()->json([
+            'categoriesById' => $categoriesById,
+        ]);
+    }
+
+    public function getCategoriesById(Request $request, $eventId): JsonResponse
+    {
+        // Configuration de l'accès à l'API Google Calendar
+        $client = new Google_Client();
+        $client->setAuthConfig(config_path('google/credentials.json'));
+        $client->setScopes(Google_Service_Calendar::CALENDAR_READONLY);
+
+        // Authentification avec une clé d'API
+        $client->setDeveloperKey('YOUR_API_KEY_HERE');
+
+        // Création du service Google Calendar
+        $service = new Google_Service_Calendar($client);
+
+        // Récupération de l'événement spécifié par son ID
+        $event = $service->events->get('charriersim@gmail.com', $eventId);
+
+        // Extraire les catégories de la description de l'événement
+        $categories = explode(',', $event->getDescription());
+
+        // Retourner les catégories au format JSON
+        return response()->json([
+            'eventId' => $eventId,
+            'categories' => $categories,
+        ]);
+    }
+
 }

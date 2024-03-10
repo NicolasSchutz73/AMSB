@@ -46,12 +46,12 @@ class Event {
 
     public function getCategories(): array
     {
-        // Vérifier si la description est une chaîne de caractères
-        if (is_string($this->description)) {
+        // Vérifier si la description est définie et est une chaîne de caractères
+        if (isset($this->description) && is_string($this->description)) {
             // Retourner un tableau des catégories en séparant la description par des virgules
             return explode(',', $this->description);
         } else {
-            // Retourner un tableau vide si la description n'est pas une chaîne de caractères
+            // Retourner un tableau vide si la description n'est pas définie ou n'est pas une chaîne de caractères
             return [];
         }
     }
@@ -59,15 +59,23 @@ class Event {
 
     public static function getEvents(Request $request): array
     {
-        // Appel à la méthode getEvents de EventsController pour récupérer les événements depuis Google Calendar
-        $eventsController = new EventsController();
-        $response = $eventsController->getEvents($request);
+    // Appel à la méthode getEvents de EventsController pour récupérer les événements depuis Google Calendar
+    $eventsController = new EventsController();
+    $response = $eventsController->getEvents($request);
 
-        // Récupérer les événements depuis la réponse JSON
-        $events = $response->getOriginalContent()['events'];
+    // Récupérer les événements depuis la réponse JSON
+    $events = $response->getOriginalContent()['events'];
 
-        return $events;
+    // Convertir la description en chaîne de caractères si elle n'est pas déjà une chaîne
+    foreach ($events as $event) {
+        if (!is_string($event['description'])) {
+            $event['description'] = json_encode($event['description']);
+        }
     }
+
+    return $events;
+    }
+
 
     public static function getCategoriesById(Request $request, $eventId): array
     {
@@ -81,4 +89,15 @@ class Event {
         return $categories;
     }
 
+    public static function getEventsByCategory(Request $request, $category): array
+    {
+        // Appel à la méthode getEventsByCategory de EventsController pour récupérer les événements d'une catégorie spécifique
+        $eventsController = new EventsController();
+        $response = $eventsController->getEventsByCategory($request, $category);
+
+        // Récupérer les événements depuis la réponse JSON
+        $events = $response->getOriginalContent()['events'];
+
+        return $events;
+    }
 }

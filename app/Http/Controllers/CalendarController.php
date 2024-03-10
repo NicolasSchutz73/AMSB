@@ -18,7 +18,7 @@ class CalendarController extends Controller
             $events = Event::getEvents($request); // Ajouter get() pour récupérer les résultats
         } else {
             // Si une catégorie est sélectionnée, filtrer les événements correspondants à cette catégorie
-            $events = Event::whereCategoryIn($category); // Ajouter get() pour récupérer les résultats
+            $events = Event::getEventsByCategory($request, $category); // Utiliser getEventsByCategory à la place de whereCategoryIn
         }
 
         // Récupérer les catégories depuis EventsController

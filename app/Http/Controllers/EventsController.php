@@ -141,7 +141,7 @@ class EventsController extends Controller
         $client->setScopes(Google_Service_Calendar::CALENDAR_READONLY);
 
         // Authentification avec une clé d'API
-        $client->setDeveloperKey('YOUR_API_KEY_HERE');
+        $client->setDeveloperKey('AIzaSyCxxKnWhC3mcOalpB-FCWJoA9Kg9jSCnPs');
 
         // Création du service Google Calendar
         $service = new Google_Service_Calendar($client);
@@ -158,5 +158,44 @@ class EventsController extends Controller
             'categories' => $categories,
         ]);
     }
+
+    public function getEventsByCategory(Request $request, $category): JsonResponse
+    {
+        // Configuration de l'accès à l'API Google Calendar
+        $client = new Google_Client();
+        $client->setAuthConfig(config_path('google/credentials.json'));
+        $client->setScopes(Google_Service_Calendar::CALENDAR_READONLY);
+
+        // Authentification avec une clé d'API
+        $client->setDeveloperKey('AIzaSyCxxKnWhC3mcOalpB-FCWJoA9Kg9jSCnPs');
+
+        // Création du service Google Calendar
+        $service = new Google_Service_Calendar($client);
+
+        // Récupération des événements
+        $calendarId = 'charriersim@gmail.com';
+        $optParams = [
+            'orderBy' => 'startTime',
+            'singleEvents' => true,
+            'timeMin' => date('c'),
+        ];
+        $results = $service->events->listEvents($calendarId, $optParams);
+        $events = $results->getItems();
+
+        // Filtrer les événements pour ceux qui contiennent la catégorie spécifiée dans leur description
+        $filteredEvents = [];
+        foreach ($events as $event) {
+            $description = $event->getDescription();
+            if ($description && strpos($description, $category) !== false) {
+                $filteredEvents[] = $event;
+            }
+        }
+
+        // Retourner les événements filtrés au format JSON
+        return response()->json([
+            'events' => $filteredEvents,
+        ]);
+    }
+
 
 }

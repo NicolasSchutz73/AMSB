@@ -26,6 +26,9 @@ Route::middleware('auth:sanctum')->group(static function () : void {
 
 });
 
+
+Route::get('/getCategories', [EventsController::class, 'getCategories']);
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });

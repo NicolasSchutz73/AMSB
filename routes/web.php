@@ -151,7 +151,7 @@ Route::post('/save-token', [App\Http\Controllers\HomeController::class, 'saveTok
 Route::post('/send-notification', [App\Http\Controllers\HomeController::class, 'sendNotification'])->name('send.notification');
 
 Route::post('/toggle-group-notification', [GroupNotificationSettingController::class, 'toggleNotificationGroup']);
-Route::get('/group/{groupId}/user/{userId}/notification-status', [GroupNotificationSettingController::class, 'getNotificationStatus']);
+Route::get('/notifications/{groupId}/{userId}', [GroupNotificationSettingController::class, 'getNotificationStatus']);
 
 /*
 |--------------------------------------------------------------------------

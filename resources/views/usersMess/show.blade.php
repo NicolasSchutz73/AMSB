@@ -29,7 +29,6 @@
         </div>
         <div class="mb-4">
             @php
-                var_dump($user);
                 $documentUrl = "http://mcida.eu/AMSB/documents/" . $user->id . ".pdf";
                 $headers = get_headers($documentUrl);
             @endphp

@@ -12,16 +12,31 @@ use Illuminate\Support\Facades\Hash;
 
 class UserMessController extends Controller
 {
+
+    /**
+     * Récupère les détails d'un utilisateur par son ID et retourne les données en JSON.
+     *
+     * @param int $id L'ID de l'utilisateur.
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getUserDetailsById($id)
+    {
+        $user = User::findOrFail($id);
+
+        return response()->json($user);
+    }
     /**
      * Affiche la liste des utilisateurs pour users
      * @return View
      */
-    public function index(): View
+    public function index($monid): View
     {
-        return view('usersMess.index', [
-            'users' => User::latest('id')->paginate(15)
+        // Utilisation de $this pour appeler une méthode dans la même classe
+        // Mais dans ce cas, vous devriez probablement accéder directement au modèle
+        $user = User::findOrFail($monid);
+        return view('usersMess.show', [
+            'user' => $user
         ]);
-
     }
 
     /**
@@ -55,18 +70,18 @@ class UserMessController extends Controller
 
 
 
-    /**
-     * Récupère les détails d'un utilisateur par son ID et retourne les données en JSON.
-     *
-     * @param int $id L'ID de l'utilisateur.
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function getUserDetailsById($id)
-    {
-        $user = User::findOrFail($id);
-
-        return response()->json($user);
-    }
+//    /**
+//     * Récupère les détails d'un utilisateur par son ID et retourne les données en JSON.
+//     *
+//     * @param int $id L'ID de l'utilisateur.
+//     * @return \Illuminate\Http\JsonResponse
+//     */
+//    public function getUserDetailsById($id)
+//    {
+//        $user = User::findOrFail($id);
+//
+//        return response()->json($user);
+//    }
 
 
     public function chatRoomUsers()

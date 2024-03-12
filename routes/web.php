@@ -37,8 +37,8 @@ Route::get('/calendar', function () {
 })->middleware(['auth', 'verified'])->name('calendar');
 
 Route::get('/usershow', function () {
-    return view('usersMess.inex');
-})->middleware(['auth', 'verified'])->name('usersMess.index');
+    return view('usersMess.index');
+})->middleware(['auth', 'verified'])->name('usersMess.show');
 
 /*
 |--------------------------------------------------------------------------
@@ -80,8 +80,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Utilisateurs dans les groupes
     Route::get('/user-groups', [GroupController::class, 'getUserGroups'])->name('user-groups');
 
-    Route::get('/usershow', [UserMessController::class, 'index'])->name('userMess.index');
-    Route::get('/usershow', [UserMessController::class, 'show'])->name('userMess.show');
+    Route::get('/usershow/{monid}', [UserMessController::class, 'index'])->name('usersMess.index');
+    Route::get('/usershow', [UserMessController::class, 'show'])->name('usersMess.show');
 
     // Vérification de groupe privé entre deux utilisateurs
     Route::get('/check-group/{userOneId}/{userTwoId}', [GroupController::class, 'checkPrivateGroup']);

@@ -33,6 +33,9 @@ Route::get('/usershow', function () {
     return view('usersMess.index');
 })->middleware(['auth', 'verified'])->name('usersMess.show');
 
+Route::get('/search-user', function () {
+    return view('searchUser.index');
+})->middleware(['auth', 'verified'])->name('searchUser.index');
 /*
 |--------------------------------------------------------------------------
 | Routes de gestion de profil
@@ -51,7 +54,7 @@ Route::middleware('auth')->group(function () {
 
 // Routes de page user
 Route::get('/search-user', [SearchUserController::class, 'index'])->name('searchUser.index');
-Route::get('/user/{id}', [SearchUserController::class, 'show'])->name('user.show');
+Route::get('/search-user', [SearchUserController::class, 'show'])->name('searchUser.show');
 
 // Routes de la messagerie et des groupes
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -95,6 +98,8 @@ Route::resources([
     'users' => UserController::class, // Gestion des utilisateurs
     'usershow' => UserMessController::class, // Gestion des utilisateurs par les mess
     'chat' => ChatController::class, // Gestion de la messagerie
+    'searchUser' => SearchUserController::class,
+
 ]);
 
 // Routes de gestion des équipes
@@ -123,6 +128,9 @@ Route::get('/files/{filename}', 'FileController@show');*/
 // Accès à l'information de l'utilisateur
 Route::get('/userinfo', [UserMessController::class, 'getUserInfo'])->middleware('auth');
 
+// Endpoint API pour lister les utilisateurs - Utiliser dans api.php pour une réponse JSON
+Route::get('/api/users', [SearchUserController::class, 'apiIndex'])->middleware('auth');
+Route::get('/usersjson', [SearchUserController::class, 'apiIndex']); // À déplacer dans api.php pour une réponse JSON
 // Endpoint API pour lister les utilisateurs - Utiliser dans api.php pour une réponse JSON
 Route::get('/api/users', [UserMessController::class, 'apiIndex'])->middleware('auth');
 Route::get('/usersjson', [UserMessController::class, 'apiIndex']); // À déplacer dans api.php pour une réponse JSON

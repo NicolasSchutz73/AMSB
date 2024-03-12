@@ -15,7 +15,6 @@
     <div class="p-6">
         <div class="mb-4">
             @php
-                var_dump($user);
                     $imageUrl = "http://mcida.eu/AMSB/profile/" . $user->id . ".jpg";
                     $headers = get_headers($imageUrl);
             @endphp

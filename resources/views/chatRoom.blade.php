@@ -7,8 +7,8 @@
 
 
 <!-- component -->
-<div class="flex flex-row h-[92vh] antialiased text-gray-800">
-    <div class="flex flex-row w-96 flex-shrink-0 bg-gray-100 p-4">
+    <div class="flex flex-col md:flex-row h-[92vh] antialiased text-gray-800">
+        <div class="conversation-list flex flex-col overflow-y-auto h-full w-full md:w-96 md:flex-shrink-0 bg-gray-100 p-4 md:block">
 
         <div class="flex flex-col w-full h-full pl-4 pr-4 py-4 -mr-4">
             <div class="flex items-center justify-center p-5">
@@ -143,8 +143,13 @@
             </div>
         </div>
     </div>
-    <div class="flex flex-col h-full w-full bg-white px-4 py-6">
+        <div class="conversation flex flex-col overflow-y-auto h-full w-full md:flex-grow bg-white px-4 py-6">
         <div id="groupHeader" class="flex flex-row items-center py-4 px-6 rounded-2xl shadow">
+            <button id="backButton" class="mr-2 md:hidden">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            </button>
             <div id="groupLogo" class="flex items-center justify-center h-10 w-10 ">
                 <div class="flex items-center justify-center h-10 w-10 ">Messagerie</div>
             </div>

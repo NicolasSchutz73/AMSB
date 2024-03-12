@@ -138,14 +138,8 @@
                     {{ __('Équipes') }}
                 </x-responsive-nav-link>
             @endcanany
-            <x-responsive-nav-link :href="route('notification')" :active="request()->routeIs('notification')">
-                {{ __('Notification') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('chat.index')" :active="request()->routeIs('chat.index')">
-                {{ __('Chat') }}
-            </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('chat-room-users')" :active="request()->routeIs('chat-room-users')">
-                {{ __('Chat room') }}
+                {{ __('Messagerie') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('my.teams')" :active="request()->routeIs('my.teams')">
                 {{ __('Mon équipe') }}

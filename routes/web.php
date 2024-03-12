@@ -63,6 +63,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Création de groupe
     Route::post('/create-group', [GroupController::class, 'store']);
+
+    Route::post('/api/groups/{group}/update-last-visited', [GroupController::class, 'updateLastVisitedAt']);
+    Route::post('/api/groups/{groupId}/reset-unread-messages', [GroupController::class, 'resetUnreadMessages']);
+
 });
 
 // Routes de gestion des rôles et utilisateurs

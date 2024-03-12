@@ -6,12 +6,18 @@ let groupChannels = {};
 let globalFirstname = '';
 let globalLastname = '';
 let globalUserId = '';
+
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('btn_affiche_user').addEventListener('click', openModal);
     document.getElementById('btn_fermer_modal_').addEventListener('click', closeModal);
     document.getElementById('nouveau-groupe-btn').addEventListener('click', toggleGroupCreationMode);
     document.getElementById('nextButton').addEventListener('click', createGroup);
 
+    showConversationList()
+
+
+    const backButton = document.getElementById('backButton'); // L'identifiant du bouton de retour
+    backButton.addEventListener('click', showConversationList);
 
     const sendButton = document.getElementById('sendButton');
     const messageInput = document.getElementById('messageInput');
@@ -29,10 +35,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
 
+
+
+
     getUserInfoAsync().then(() => {
         loadUserGroups();
         loadUserConversation();
         startRefreshingConversations();
+        loadUnreadMessagesCount()
+
+
 
 
 
@@ -68,6 +80,21 @@ function getUserInfoAsync() {
     });
 }
 
+function showConversationList() {
+    const conversationList = document.querySelector('.conversation-list');
+    const conversation = document.querySelector('.conversation');
+    conversationList.classList.remove('hidden');
+    conversation.classList.add('hidden');
+}
+
+// Cette fonction montre une conversation spécifique et cache la liste des conversations
+function showConversation() {
+    console.log("show")
+    const conversationList = document.querySelector('.conversation-list');
+    const conversation = document.querySelector('.conversation');
+    conversationList.classList.add('hidden');
+    conversation.classList.remove('hidden');
+}
 
 
 
@@ -282,11 +309,16 @@ function joinGroupChat(groupId, groupName) {
     // Efface les messages précédents
     document.querySelector('.grid.grid-cols-12.gap-y-2').innerHTML = '';
 
+    // Met à jour le moment de la dernière visite dans la base de données
+    updateLastVisitedAt(groupId); // Mettre à jour la dernière visite
+
     // Charge les messages précédents pour le groupe sélectionné
     loadPreviousMessages(groupId);
 
     // Abonne au canal du groupe
     subscribeToGroupChannel(groupId);
+
+    showConversation()
 }
 function subscribeToGroupChannel(groupId) {
     if (!groupChannels[groupId]) {
@@ -352,6 +384,7 @@ function sendMessage() {
             loadPreviousMessages(currentGroupId);
             triggerPushNotification(currentGroupId, messageContent, globalUserId);
             loadUserConversation()
+            updateConversationPreview(currentGroupId)
         })
         .catch(error => {
             console.error('Erreur d\'envoi', error);
@@ -368,6 +401,8 @@ function sendMessage() {
 
 
 function appendMessageToChat(messageContent, authorID, authorFirstname, authorLastname,fileData) {
+
+
 
     //console.log(fileData)
 
@@ -535,7 +570,9 @@ function createPrivateGroup(userOneId, userTwoId) {
 
 
 function loadUserConversation() {
-    axios.get('/api/user-groups?type=private')
+    loadUnreadMessagesCount().then(() => {
+
+        axios.get('/api/user-groups?type=private')
         .then(response => {
             const groups = response.data.groups;
             const conversationsContainer = document.querySelector('.flex.flex-col.divide-y.h-full.overflow-y-auto.-mx-4');
@@ -544,9 +581,13 @@ function loadUserConversation() {
             conversationsContainer.innerHTML = '';
 
             groups.forEach(group => {
+
+                const unreadCount = group.unreadMessagesCount;
+
+
                 const otherMember = group.members.find(member => member.id !== globalUserId);
 
-                // Créer un nouvel élément pour chaque conversation
+
                 const conversationElement = document.createElement('div');
                 conversationElement.classList.add('flex', 'flex-row', 'items-center', 'p-4', 'relative');
                 conversationElement.setAttribute('data-conversation-id', group.id); // Attribut de données unique pour chaque conversation
@@ -574,21 +615,26 @@ function loadUserConversation() {
                 lastMessageElement.textContent = group.lastMessageContent || 'Pas de messages';
                 lastMessageElement.setAttribute('data-last-message', group.id);
 
+
                 // Nombre de nouveaux messages
-                const newMessagesElement = document.createElement('div');
-                newMessagesElement.classList.add('flex-shrink-0', 'ml-2', 'self-end', 'mb-1');
-                const messagesCountElement = document.createElement('span');
-                messagesCountElement.classList.add('flex', 'items-center', 'justify-center', 'h-5', 'w-5', 'bg-red-500', 'text-white', 'text-xs', 'rounded-full');
-                messagesCountElement.textContent = group.newMessagesCount || ''; // À définir selon votre logique de comptage des nouveaux messages
+                    const newMessagesElement = document.createElement('div');
+                    newMessagesElement.classList.add('flex-shrink-0', 'ml-2', 'self-end', 'mb-1');
+                    const messagesCountElement = document.createElement('span');
+                    messagesCountElement.classList.add('flex', 'items-center', 'justify-center', 'h-5', 'w-5', 'bg-red-500', 'text-white', 'text-xs', 'rounded-full');
+                    messagesCountElement.textContent = unreadCount || ''; // À définir selon votre logique de comptage des nouveaux messages
+
+
 
                 // Assemblage des éléments
                 groupInfoElement.appendChild(groupNameElement);
                 groupInfoElement.appendChild(lastMessageElement);
-                //newMessagesElement.appendChild(messagesCountElement);
+            if (unreadCount > 0) {
+                newMessagesElement.appendChild(messagesCountElement);
+            }
                 conversationElement.appendChild(timeElement);
                 conversationElement.appendChild(iconElement);
                 conversationElement.appendChild(groupInfoElement);
-                conversationElement.appendChild(newMessagesElement);
+                //conversationElement.appendChild(newMessagesElement);
 
                 // Ajouter un écouteur d'événements pour rejoindre la conversation lors du clic
                 conversationElement.addEventListener('click', () => joinGroupChat(group.id, groupNameElement.textContent));
@@ -601,7 +647,7 @@ function loadUserConversation() {
         })
         .catch(error => console.error('Erreur lors du chargement des groupes', error));
 }
-
+    )}
 
 function triggerPushNotification(groupId, messageContent, globaluserId) {
     // Utilisez "Image" comme contenu par défaut si messageContent est vide
@@ -679,24 +725,82 @@ function subscribeToAllGroupChannelsPrivate(groups) {
     });
 }
 
-function updateConversationPreview(conversationId, messageContent, messageTime) {
-    // Sélectionner les éléments de la conversation en utilisant les attributs de données
-    const lastMessageElement = document.querySelector(`[data-conversation-id="${conversationId}"] [data-last-message]`);
-    if (lastMessageElement) {
-        lastMessageElement.textContent = messageContent || 'Nouveau message';
-    }
+function updateConversationPreview(conversationId) {
+    loadUnreadMessagesCount().then(groupsWithUnreadCounts => {
+        loadUserConversation()
+        loadPreviousMessages(conversationId)
 
-    const lastMessageTimeElement = document.querySelector(`[data-conversation-id="${conversationId}"] [data-last-message-time]`);
-    if (lastMessageTimeElement) {
-        lastMessageTimeElement.textContent = messageTime || new Date().toLocaleTimeString(); // Utilisez votre logique de formatage de date
-    }
+        // Trouver les données du groupe spécifique en utilisant son ID
+        const groupData = groupsWithUnreadCounts.find(group => group.id === conversationId);
+        const unreadCount = groupData ? groupData.unreadMessagesCount : 0;
 
-    // Mettre à jour d'autres éléments si nécessaire
+        // Sélectionner les éléments de la conversation en utilisant les attributs de données
+        const lastMessageElement = document.querySelector(`[data-conversation-id="${conversationId}"] [data-last-message]`);
+        if (lastMessageElement) {
+            lastMessageElement.textContent = groupData.lastMessageContent || 'Nouveau message';
+        }
+
+        const lastMessageTimeElement = document.querySelector(`[data-conversation-id="${conversationId}"] [data-last-message-time]`);
+        if (lastMessageTimeElement) {
+            lastMessageTimeElement.textContent = groupData.lastMessageTime || new Date().toLocaleTimeString();
+        }
+
+        // Sélectionnez l'élément pour afficher le compte des messages non lus
+        const messagesCountElement = document.querySelector(`[data-conversation-id="${conversationId}"] .messages-count`);
+        if (messagesCountElement) {
+            if (unreadCount > 0) {
+                messagesCountElement.textContent = unreadCount;
+                messagesCountElement.classList.remove('hidden');
+            } else {
+                messagesCountElement.classList.add('hidden');
+            }
+        }
+
+    }).catch(error => {
+        console.error("Erreur lors du chargement du nombre de messages non lus:", error);
+    });
 }
 
 
 
+function updateLastVisitedAt(groupId) {
+    axios.post(`/api/groups/${groupId}/update-last-visited`) // Assurez-vous que cette route est définie dans votre backend
+        .then(response => {
+            console.log("Dernière visite mise à jour pour le groupe:", groupId);
+            loadUserConversation()
+        })
+        .catch(error => {
+            console.error("Erreur lors de la mise à jour de la dernière visite:", error);
+        });
+}
 
+
+
+function loadUnreadMessagesCount() {
+    // Retourner une promesse qui résoudra avec les données des groupes
+    return new Promise((resolve, reject) => {
+        axios.get('/api/user-groups')
+            .then(response => {
+                const groups = response.data.groups;
+                const groupsWithUnreadCounts = groups.map(group => {
+                    // Assurez-vous que lastMessageContent et lastMessageTime sont renvoyés par votre API
+                    return {
+                        id: group.id,
+                        unreadMessagesCount: group.unreadMessagesCount,
+                        lastMessageContent: group.lastMessageContent,
+                        lastMessageTime: group.lastMessageTime,
+                    };
+                });
+
+                // Résoudre la promesse avec les données de groupes mises à jour
+                resolve(groupsWithUnreadCounts);
+            })
+            .catch(error => {
+                console.error("Erreur lors du chargement des groupes et du nombre de messages non lus:", error);
+                reject(error); // Rejeter la promesse en cas d'erreur
+            });
+    });
+}
 
 
 

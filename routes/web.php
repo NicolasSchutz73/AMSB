@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\GroupNotificationSettingController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
@@ -148,6 +149,9 @@ Route::get('/notification', function () {
 
 Route::post('/save-token', [App\Http\Controllers\HomeController::class, 'saveToken'])->name('save-token');
 Route::post('/send-notification', [App\Http\Controllers\HomeController::class, 'sendNotification'])->name('send.notification');
+
+Route::post('/toggle-group-notification', [GroupNotificationSettingController::class, 'toggleNotificationGroup']);
+Route::get('/group/{groupId}/user/{userId}/notification-status', [GroupNotificationSettingController::class, 'getNotificationStatus']);
 
 /*
 |--------------------------------------------------------------------------

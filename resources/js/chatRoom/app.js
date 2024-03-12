@@ -7,7 +7,6 @@ let groupChannels = {};
 
 
 
-
 document.addEventListener('DOMContentLoaded', function() {
     loadUsers();
     loadUserGroups();

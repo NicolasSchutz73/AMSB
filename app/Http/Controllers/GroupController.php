@@ -246,14 +246,18 @@ class GroupController extends Controller
             return response()->json(['error' => 'Group not found'], 404);
         }
 
-        // Récupérer les tokens FCM des membres du groupe
+        // Récupérer les tokens FCM des membres du groupe ayant activé les notifications
         $firebaseTokens = $group->users()
+            ->join('group_notification_settings', 'users.id', '=', 'group_notification_settings.user_id')
+            ->where('group_notification_settings.group_id', $validatedData['groupId'])
+            ->where('group_notification_settings.notifications_enabled', true)
             ->whereNotNull('device_token')
             ->where('users.id', '!=', $validatedData['id_sender']) // Exclure l'expéditeur
             ->pluck('device_token')
             ->all();
+
         if (empty($firebaseTokens)) {
-            return response()->json(['error' => 'No members with registered devices in this group'], 404);
+            return response()->json(['error' => 'No members with enabled notifications in this group'], 404);
         }
 
         // Configuration de la clé API du serveur FCM et des données de la notification

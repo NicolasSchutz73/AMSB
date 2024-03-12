@@ -1,5 +1,4 @@
 import axios from "axios";
-import Echo from 'laravel-echo';
 
 let currentGroupId = null;
 let groupChannels = {};
@@ -234,6 +233,58 @@ function loadUserGroups() {
                 lastMessageElement.textContent = group.lastMessageContent || 'Pas de messages';
                 lastMessageElement.setAttribute('data-last-message', group.id);
 
+                //bouton notif
+                const boutonNOTIF = document.createElement('div');
+                boutonNOTIF.classList.add('flex', 'flex-col', 'flex-grow', 'ml-3');
+                const boutonElement = document.createElement('div');
+                // Ajoutez du texte au bouton
+                boutonElement.textContent = 'Sound';
+// Ajoutez des classes au bouton pour le style (supposons que vous utilisiez TailwindCSS par exemple)
+                boutonElement.className = 'bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded';
+// Ajoutez un écouteur d'événements au bouton pour gérer les clics
+                const groupId = group.id;
+                fetch(`/group/${groupId}/user/${globalUserId}/notification-status`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const button = document.getElementById('notificationToggleButton'); // Assurez-vous que cet ID correspond à votre bouton
+                        if (data.notifications_enabled) {
+                            button.classList.add('bg-green-500'); // Classe pour un bouton vert
+                            button.classList.remove('bg-gray-500'); // Retire la classe pour un bouton non-vert
+                            button.textContent = 'Désactiver les notifications'; // Change le texte du bouton
+                        } else {
+                            button.classList.add('bg-gray-500'); // Classe pour un bouton non-vert
+                            button.classList.remove('bg-green-500'); // Retire la classe pour un bouton vert
+                            button.textContent = 'Activer les notifications'; // Change le texte du bouton
+                        }
+                    })
+                    .catch(error => console.error('Erreur lors de la récupération de l\'état des notifications:', error));
+                boutonElement.addEventListener('click', function() {
+                    console.log('Bouton cliqué!');
+                    console.log(group.id);
+                    console.log(globalUserId);
+
+                        axios.post('/toggle-group-notification', {
+                            group_id: group.id, // L'ID du groupe, à dynamiser selon votre logique d'application
+                            user_id: globalUserId, // L'ID de l'utilisateur, généralement obtenu via l'authentification
+                            enable: true, // ou false, selon l'état actuel du bouton
+                        })
+                            .then(response => {
+                                console.log(response.data.message);
+                                // Mettre à jour l'interface utilisateur en conséquence
+                            })
+                            .catch(error => {
+                                console.error("There was an error toggling the notification setting:", error);
+                            });
+
+                });
+                // Ajoutez le bouton à l'élément div
+                boutonNOTIF.appendChild(boutonElement);
+
 
                 // Nombre de nouveaux messages
                 const newMessagesElement = document.createElement('div');
@@ -245,6 +296,7 @@ function loadUserGroups() {
                 // Assemblage des éléments
                 groupInfoElement.appendChild(groupNameElement);
                 groupInfoElement.appendChild(lastMessageElement);
+
                 if (group.newMessagesCount > 0) {
                     newMessagesElement.appendChild(messagesCountElement);
                 }
@@ -252,7 +304,7 @@ function loadUserGroups() {
                 groupElement.appendChild(iconElement);
                 groupElement.appendChild(groupInfoElement);
                 groupElement.appendChild(newMessagesElement);
-
+                groupElement.appendChild(boutonNOTIF);
                 // Ajout d'un écouteur d'événements pour le clic
                 groupElement.addEventListener('click', () => joinGroupChat(group.id, groupNameElement.textContent));
 

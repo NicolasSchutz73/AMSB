@@ -8,7 +8,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\RoleController;
-//use App\Http\Controllers\SearchUserController;
+use App\Http\Controllers\SearchUserController;
 use App\Http\Controllers\UserMessController;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\TeamController;

@@ -8,7 +8,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\RoleController;
-use App\Http\Controllers\SearchUserController;
+//use App\Http\Controllers\SearchUserController;
+use App\Http\Controllers\UserMessController;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\CalendarController;
@@ -25,9 +26,21 @@ Route::get('/dashboard', function () {
 
 
 // Recherche d'utilisateurs
-Route::get('/search-user', function () {
+/*Route::get('/search-user', function () {
     return view('searchUser.index');
-})->middleware(['auth', 'verified'])->name('searchUser.index');
+})->middleware(['auth', 'verified'])->name('searchUser.index');*/
+Route::get('/usershow', function () {
+    return view('usersMess.index');
+})->middleware(['auth', 'verified'])->name('usersMess.show');
+
+/*
+|--------------------------------------------------------------------------
+| Routes de gestion de profil
+|--------------------------------------------------------------------------
+|
+| Ces routes permettent à l'utilisateur de modifier et supprimer son profil.
+|
+*/
 
 // Routes de gestion de profil
 Route::middleware('auth')->group(function () {
@@ -57,6 +70,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Utilisateurs dans les groupes
     Route::get('/user-groups', [GroupController::class, 'getUserGroups'])->name('user-groups');
 
+    Route::get('/usershow/{monid}', [UserMessController::class, 'index'])->name('usersMess.index');
+    Route::get('/usershow', [UserMessController::class, 'show'])->name('usersMess.show');
+
     // Vérification de groupe privé entre deux utilisateurs
     Route::get('/check-group/{userOneId}/{userTwoId}', [GroupController::class, 'checkPrivateGroup']);
 
@@ -71,10 +87,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // Routes de gestion des rôles et utilisateurs
 Route::resources([
-    'roles' => RoleController::class,
+    /*'roles' => RoleController::class,
     'users' => UserController::class,
     'searchUser' => SearchUserController::class,
-    'chat' => ChatController::class,
+    'chat' => ChatController::class,*/
+    'roles' => RoleController::class, // Gestion des rôles
+    'users' => UserController::class, // Gestion des utilisateurs
+    'usershow' => UserMessController::class, // Gestion des utilisateurs par les mess
+    'chat' => ChatController::class, // Gestion de la messagerie
 ]);
 
 // Routes de gestion des équipes
@@ -96,10 +116,16 @@ Route::post('/send-notification', [HomeController::class, 'sendNotification'])->
 // Routes supplémentaires et API
 Route::get('/userinfo', [SearchUserController::class, 'getUserInfo'])->middleware('auth');
 
-Route::get('/api/users', [SearchUserController::class, 'apiIndex'])->middleware('auth');
+/*Route::get('/api/users', [SearchUserController::class, 'apiIndex'])->middleware('auth');
 Route::get('/usersjson', [SearchUserController::class, 'apiIndex']); // À déplacer dans api.php pour une réponse JSON
 
-Route::get('/files/{filename}', 'FileController@show');
+Route::get('/files/{filename}', 'FileController@show');*/
+// Accès à l'information de l'utilisateur
+Route::get('/userinfo', [UserMessController::class, 'getUserInfo'])->middleware('auth');
+
+// Endpoint API pour lister les utilisateurs - Utiliser dans api.php pour une réponse JSON
+Route::get('/api/users', [UserMessController::class, 'apiIndex'])->middleware('auth');
+Route::get('/usersjson', [UserMessController::class, 'apiIndex']); // À déplacer dans api.php pour une réponse JSON
 
 Route::get('/calendar', [CalendarController::class, 'show'])->name('calendar');
 

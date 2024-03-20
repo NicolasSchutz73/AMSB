@@ -332,11 +332,11 @@
         </div>
     </div>
 
-    @vite('resources/js/chatRoom/notif.js')
+    @vite(['resources/js/chatRoom/notif.js'])
 
-    @vite('resources/js/chatRoom/affiche_user.js')
-    @vite('resources/js/chatRoom/btn_image.js')
-    @vite('resources/js/bootstrap.js')
+    @vite(['resources/js/chatRoom/affiche_user.js'])
+    @vite(['resources/js/chatRoom/btn_image.js'])
+    @vite(['resources/js/bootstrap.js'])
 
 
     <!-- Dans votre vue Blade (par exemple, dans resources/views/welcome.blade.php) -->

@@ -10,6 +10,9 @@ export default defineConfig({
             input: [
                 'resources/css/app.css',
                 'resources/js/app.js',
+                'resources/js/chatRoom/notif.js',
+                'resources/js/chatRoom/affiche_user.js',
+                'resources/js/chatRoom/btn_image.js'
             ],
             refresh: true,
         }),

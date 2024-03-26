@@ -83,10 +83,17 @@ class EventsController extends Controller
             $eventObjects[] = $event;
         }
 
+        foreach ($formattedEvents as $eventData) {
+            // Créer ou mettre à jour l'événement dans la base de données
+            Event::updateOrCreate(['id' => $eventData['id']], $eventData);
+        }
+
         // Retourner les événements au format JSON
         return response()->json([
             'events' => $eventObjects, // Retournez les objets Event au lieu des données formatées
         ]);
+
+
     }
 
     public function getCategories(Request $request): JsonResponse

@@ -4,8 +4,9 @@ namespace App\Models;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\EventsController;
+use Illuminate\Database\Eloquent\Model;
 
-class Event {
+class Event extends Model{
     public $id;
     public $title;
     public $description;

@@ -7,80 +7,55 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Menu déroulant des catégories -->
             <select id="category-filter" onchange="changeCategory()">
                 <option value="">Toutes les catégories</option>
-                @foreach($categories ?? [] as $category)
+                @foreach($categories as $category)
                     <option value="{{ $category }}">{{ $category }}</option>
                 @endforeach
             </select>
 
-            <script>
-                function changeCategory() {
-                    var category = document.getElementById('category-filter').value;
-                    window.location.href = '/calendar?category=' + encodeURIComponent(category);
-                }
-            </script>
-
             <br><br>
 
-            <!-- Calendrier -->
             <div id='calendar'></div>
-
         </div>
     </div>
 
-    <!-- Script pour filtrer les événements par catégorie -->
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.11/index.global.js'></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                // Votre configuration de calendrier ici
+            // Encodage direct en JSON sans JSON.parse
+            var events = {!! json_encode($events->map(function($event) {
+            return [
+                'id' => $event->id,
+                'title' => $event->title,
+                'description' => $event->description,
+                'location' => $event->location,
+                'start' => $event->start,
+                'end' => $event->end,
+                'isRecurring' => $event->isRecurring,
+                // Ajoutez ici d'autres propriétés nécessaires pour FullCalendar
+            ];
+        })->toArray(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!};
+
+            console.log(events);
+
+                var calendarEl = document.getElementById('calendar');
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,listDay'
+            },
+                initialView: 'dayGridMonth', // This will show the month view with blocks
+                events: events
             });
-            calendar.render();
-
-            // Récupérer la catégorie depuis l'URL
-            var urlParams = new URLSearchParams(window.location.search);
-            var category = urlParams.get('category');
-            console.log('Category from URL:', category); // Vérifiez que la catégorie est correctement extraite de l'URL
-
-            // Filtrer les événements par catégorie lorsqu'une catégorie est spécifiée dans l'URL
-            if (category) {
-                calendar.getEvents().forEach(function(event) {
-                    console.log('Event categories:', event.extendedProps.categories); // Vérifiez les catégories de chaque événement
-                    if (event.extendedProps.categories.includes(category)) {
-                        event.setProp('display', 'block');
-                    } else {
-                        event.setProp('display', 'none');
-                    }
-                });
-            } else {
-                // Afficher tous les événements si aucune catégorie n'est spécifiée dans l'URL
-                calendar.getEvents().forEach(function(event) {
-                    event.setProp('display', 'block');
-                });
-            }
-
-            // Filtrer les événements par catégorie lorsqu'une catégorie est sélectionnée dans le menu déroulant
-            document.getElementById('category-filter').addEventListener('change', function() {
-                var category = this.value;
-                console.log('Selected category:', category); // Vérifiez la catégorie sélectionnée dans le menu déroulant
-                if (category) {
-                    calendar.getEvents().forEach(function(event) {
-                        console.log('Event categories:', event.extendedProps.categories); // Vérifiez les catégories de chaque événement
-                        if (event.extendedProps.categories.includes(category)) {
-                            event.setProp('display', 'block');
-                        } else {
-                            event.setProp('display', 'none');
-                        }
-                    });
-                } else {
-                    calendar.getEvents().forEach(function(event) {
-                        event.setProp('display', 'block');
-                    });
-                }
-            });
+                calendar.render();
         });
 
+        function changeCategory() {
+            var category = document.getElementById('category-filter').value;
+            window.location.href = '/calendar?category=' + encodeURIComponent(category);
+        }
     </script>
 </x-app-layout>
